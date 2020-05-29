@@ -50,7 +50,8 @@ class FeedBrowser extends React.Component {
 		.then(() => { 
 			this.fetch();
 			setTimeout(function() { this.fetch(); }.bind(this), 5000)
-		});
+		},
+		e => {});
 	}
 
 	handleClick(x) {

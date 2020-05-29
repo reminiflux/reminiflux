@@ -73,6 +73,23 @@ If you are using [nginx-proxy](https://github.com/nginx-proxy/nginx-proxy), you 
 
 If you are using another reverse proxy, you will need to follow its configuration instructions to achieve the same result.
 
+### Option 3: Use Docker container
+
+While it would not make sense to host reminiflux in a Docker container itself, a Docker container has been prepared that contains both reminiflux and a proxy server to circumvent the CORS issue. With this solution, the application and the proxy will be at the same origin (the Docker container), and therefore CORS will not be involved. The proxy will transparently forward your requests to your miniflux instance. If you are able to host Docker containers, this is probably the easiest solution for the time being.
+
+The image is available on Docker Hub as [abali/reminiflux](https://hub.docker.com/repository/docker/abali/reminiflux) and you can use it in the following way:
+
+    $ docker run -p 8080:80 abali/reminiflux
+
+Reminiflux will be available on port 8080 of your Docker host and you should set your miniflux URL to `http://<dockerhost:dockerport>/p/<your original miniflux url>` e.g. `http://localhost:8080/p/https://miniflux.mytld.com`.
+
+Alternatively, you can use the supplied Dockerfile to build the container yourself:
+
+    $ git clone https://github.com/reminiflux/reminiflux.git
+    $ cd reminiflux
+    $ docker build -t reminiflux
+    $ docker run -p 8080:80 reminiflux
+
 ## Future plans and contributing
 
 Reminiflux should be a fully functional alternative web frontend for miniflux. Some administrative features or features not exposed by miniflux's API might remain available only in miniflux.
