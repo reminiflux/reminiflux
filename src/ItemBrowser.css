@@ -1,0 +1,38 @@
+div.itemlist { padding: 5px }
+table.itemlist { border: none; border-collapse: collapse; width: 100%; table-layout: fixed }
+tr.selected { background-color: lightgray; }
+tr.itemlistitem:hover { background-color: grey; cursor: pointer }
+td.readstatus { width: 20px; }
+td.title { white-space: nowrap; overflow: hidden }
+.read td.title { color: #999 }
+td.timestamp { width: 40px; text-align: right }
+div.itemlistcontrol { padding: 2px; width: 100%; background: #ddd; border-bottom: 1px solid lightgray }
+div.controlcontrols { float: right; }
+
+div.controltitle { display: inline-block; font-weight: bold; font-size: 120%; 
+	position: relative; top: 50%; transform: translateY(-50%);  }
+
+span.controltitlecounter { font-weight: normal ; font-size: 90% }
+.controltitle a { text-decoration: none; color: inherit }
+
+
+.controlcontrols button { height: 20px; font-size: 90%  }
+
+.readdot {
+	height: 10px;
+	width: 10px;
+	border: 1px solid #bbb;
+	border-radius: 50%;
+	display: inline-block;
+	vertical-align: center;
+  }
+
+.unreaddot {
+	height: 10px;
+	width: 10px;
+	border: 1px solid #bbb;
+	background-color: #555;
+	border-radius: 50%;
+	display: inline-block;
+
+}
