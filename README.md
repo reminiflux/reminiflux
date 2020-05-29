@@ -10,7 +10,7 @@ Reminiflux is pure web application written in React that uses the API provided b
 
 **Attention! Connecting to miniflux api currently requires some workarounds, please see below for details.**
 
-[** >>> Launch reminiflux at https://reminiflux.github.io <<< **](https://reminiflux.github.io)
+[**>>> Launch reminiflux at https://reminiflux.github.io <<<**](https://reminiflux.github.io)
 
 ## Installation
 
