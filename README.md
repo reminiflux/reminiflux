@@ -87,7 +87,7 @@ Alternatively, you can use the supplied Dockerfile to build the container yourse
 
     $ git clone https://github.com/reminiflux/reminiflux.git
     $ cd reminiflux
-    $ docker build -t reminiflux
+    $ docker build . -t reminiflux
     $ docker run -p 8080:80 reminiflux
 
 ## Future plans and contributing
