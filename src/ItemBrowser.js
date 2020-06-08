@@ -7,44 +7,66 @@ class ItemBrowser extends React.Component {
 	constructor(props) {
 	  super(props);
 	  this.state = {
-		items: [],
+		items:  [],
 		filter: localStorage.getItem('filter') || 'u',
-		sort: localStorage.getItem('sort') || 'n'
+		sort:   localStorage.getItem('sort') || 'n'
 	  };
-	  this.fetch = this.fetch.bind(this);
+	  this.fetch            = this.fetch.bind(this);
+	  this.getFeeds         = this.getFeeds.bind(this);
+	  this.fetchFeed        = this.fetchFeed.bind(this);
 	  this.toggleReadStatus = this.toggleReadStatus.bind(this);
-	  this.toggleFilter = this.toggleFilter.bind(this);
-	  this.toggleSort = this.toggleSort.bind(this);
-	  this.markAllRead = this.markAllRead.bind(this);
+	  this.toggleFilter     = this.toggleFilter.bind(this);
+	  this.toggleSort       = this.toggleSort.bind(this);
+	  this.markAllRead      = this.markAllRead.bind(this);
+	  this.handleClick      = this.handleClick.bind(this);
 	}
 	componentDidMount() {
 	  this.fetch();
 	}
 	componentDidUpdate(prevProps, prevState) {
-	  if (prevProps.feed !== this.props.feed || 
-		  prevState.sort !== this.state.sort ||
+	  if (prevProps.currentFeed !== this.props.currentFeed || 
+		  prevProps.currentCategory !== this.props.currentCategory || 
+	      ((prevState.sort !== this.state.sort) && this.state.items.length > 100) ||
 		  prevState.filter !== this.state.filter) {
 		this.fetch();
 	  }
-	  if (prevProps.item !== this.props.item && 
-		  this.props.item) {
-		  this.toggleReadStatus(this.props.item, true);
+	  if (prevProps.currentItem !== this.props.currentItem && 
+		  this.props.currentItem) {
+		  this.toggleReadStatus(this.props.currentItem, true);
 	  }
 	}
+
+	getFeeds() {
+		var fs = [];
+		if (this.props.currentFeed) {
+			fs = [this.props.currentFeed];
+		} else if (this.props.currentCategory) {
+			fs = Object.values(this.props.feeds)
+			.filter(f => f.category.id === this.props.currentCategory.id)
+		}
+		return fs;
+  
+	}
 	fetch() {
-	  if (!this.props.feed) {
-		return;
-	  }
-	  apiCall('feeds/' + this.props.feed.id + '/entries?' +
-			  'limit=' + (parseInt(localStorage.getItem('fetch_limit')) || 100) +
-	          '&order=published_at&direction=' + (this.state.sort === 'n' ? 'desc' : 'asc') + 
-	          (this.state.filter === 'u' ? '&status=unread' : ''), this.props.errorHandler)
-	  .then(i => this.setState({items: i ? i.entries : []}),
-	  e => {}); 
+	  this.setState({items: []});
+	  this.getFeeds().forEach(f => {
+		  if (f.unreads > 0 || this.state.filter === 'a') {
+			  this.fetchFeed(f)
+		  }
+		});
+	}
+
+	fetchFeed(f) {
+		apiCall('feeds/' + f.id + '/entries?' +
+		'limit=' + (parseInt(localStorage.getItem('fetch_limit')) || 100) +
+		'&order=published_at&direction=' + (this.state.sort === 'n' ? 'desc' : 'asc') + 
+		(this.state.filter === 'u' ? '&status=unread' : ''), this.props.errorHandler)
+		.then(i => this.setState({items: this.state.items.concat(i ? i.entries : [])}),
+		e => {});
 	}
 
 	handleClick(item) {
-	  	this.props.onItemChange(item);
+		this.props.onItemChange(item);
 	}
 
 	toggleReadStatus(item, read) {
@@ -55,7 +77,7 @@ class ItemBrowser extends React.Component {
 		.then(() => {
 			i[index].status = newStatus;
 			this.setState({items: i});
-			this.props.updateUnread(this.props.feed);
+			this.props.updateUnread(i[index].feed);
 		},
 		e => {});
 	}
@@ -73,7 +95,9 @@ class ItemBrowser extends React.Component {
 	markAllRead() {
 		if (this.state.items.length > 0) {
 			apiCall('entries', this.props.errorHandler, { 'entry_ids' : this.state.items.map(x => x.id), 'status' : 'read'})
-			.then(() => { this.props.updateUnread(this.props.feed); this.fetch(); },
+			.then(() => { 
+				this.getFeeds().forEach(f => this.props.updateUnread(f));
+				this.fetch(); },
 			e => {});
 		}
 	}
@@ -82,11 +106,15 @@ class ItemBrowser extends React.Component {
 		if (!f || !i) { 
 			return ; 
 		}
+		const link = f.site_url ? 
+			<a href={f.site_url} target="_blank"  rel="noopener noreferrer">&#8599;</a> : 
+			"";
 		return (
-		<div className="controltitle">
-			<span className="controltitletitle">{f.title}</span>&nbsp;
-			<a href={f.site_url} target="_blank"  rel="noopener noreferrer">&#8599;</a>&nbsp;
-			<span className="controltitlecounter"> {i.length} items</span>
+		<div className="itemlisttitle">
+			<span className="titlename">{f.title}</span>&nbsp;
+			{link}
+			&nbsp;
+			<span className="titlecounter"> {i.length} items</span>
 		</div>
 		);
 	}
@@ -97,10 +125,12 @@ class ItemBrowser extends React.Component {
 	  
 	  return (
 		<SplitPane split="horizontal" minSize="26px" defaultSize="26px" allowResize={false} pane2Style={{ 'background': '#f5f5f5'}} >
-        <div className="itemlistcontrol">
-			{ this.feedlink(this.props.feed, items) }
+        
+		<div className="itemlistcontrol">
+
+			{ this.feedlink(this.props.currentFeed || this.props.currentCategory, items) }
 			
-			<div className="controlcontrols">
+			<div className="itemlistcontrolbuttons">
 			  <button onClick={this.markAllRead}> &#10003; Mark all as read</button>
 			  <select onChange={this.toggleFilter} value={this.state.filter}>
 				  <option value='u'>Show unread only</option>
@@ -116,13 +146,20 @@ class ItemBrowser extends React.Component {
 		<div className="itemlist">
 		<table className="itemlist">
 			<tbody>
-			{items.map(item => (
+			{items
+			.sort((a,b) => this.state.sort === 'o' ? 
+			   a.published_at.localeCompare(b.published_at) :
+			   b.published_at.localeCompare(a.published_at))
+			.map(item => (
 			  <tr
 			  className={`itemlistitem 
-			  ${item.id === this.props.item ? "selected" : ""}
+			  ${item.id === this.props.currentItem ? "selected" : ""}
 			  ${item.status === 'unread' ? 'unread' : 'read'}
 			  `} 
 			  key={item.id}>
+			  <td className="favico">
+			  <img className="minifavico" src={this.props.feeds[item.feed.id].icon_data} alt="" />
+			  </td>
 			  <td className="readstatus">
 				  <div className={item.status === 'unread' ? 'unreaddot' : 'readdot'} 
 				       title="Toggle read"

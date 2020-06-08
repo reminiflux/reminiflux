@@ -1,11 +1,17 @@
-div.category { font-weight: bold }
+div.feedlist { padding: 5px }
+
+div.categoryrow { margin-left: 0px; padding: 2px }
+div.category { margin-left: 0px; font-weight: bold; display:inline-block  }
+div.categoryrow:hover { background-color: grey; cursor: pointer }
+div.categoryrow.selected { background-color: lightslategrey; }
+
 div.feedrow { margin-left: 20px; padding: 2px }
 div.feed { margin-left: 5px; display:inline-block }
 div.feedrow:hover { background-color: grey; cursor: pointer }
 div.feedrow.selected { background-color: lightslategrey; }
 div.feed.read { color: lightgray }
-div.feedlist { padding: 5px }
 img.favico { width: 16px; height: 16px; vertical-align: middle }
+
 .errorfeed { background-color: lightcoral }
-span.unreadcount { margin-left: 10px; background-color: #2a89bc; border: 1px solid #2a89bc; float: right; position: relative; border-radius: 4px; font-weight: bold; text-align: center; font-size: 10px; color: white; min-width: 20px}
-.refresh { float: right; margin-top: 0px; margin-right: 5px; font-size: 16px; width: 30px; height: 30px } 
+.feed span.unreadcount { margin-left: 10px; background-color: #2a89bc; border: 1px solid #2a89bc; float: right; position: relative; border-radius: 4px; font-weight: bold; text-align: center; font-size: 10px; color: white; min-width: 20px}
+.category span.unreadcount { margin-left: 10px; background-color: #454545; border: 1px solid #454545; float: right; position: relative; border-radius: 4px; font-weight: bold; text-align: center; font-size: 10px; color: white; min-width: 20px}

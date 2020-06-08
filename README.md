@@ -35,7 +35,7 @@ This functionality has been requested [here](https://github.com/miniflux/miniflu
 
 ### Option 1: Use a CORS proxy
 
-The problem can be solved by introducing a CORS proxy between reminiflux and miniflux. This proxy will modify the responses coming from miniflux to make the browser running reminiflux that miniflux supports CORS.
+The problem can be solved by introducing a CORS proxy between reminiflux and miniflux. This proxy will modify the responses coming from miniflux to make the browser running reminiflux believe that miniflux supports CORS.
 
 #### Option 1/A: Use a hosted service
 

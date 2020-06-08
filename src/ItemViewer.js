@@ -14,17 +14,17 @@ class ItemViewer extends React.Component {
 	componentDidMount() {
 	  this.fetch();
 	}
-	componentDidUpdate(prev) {
-	  if (prev.item !== this.props.item) {
+	componentDidUpdate(prevProps) {
+	  if (prevProps.currentItem !== this.props.currentItem) {
 		this.fetch();
 	  }
 	}
 	fetch() {
-	  if (!this.props.item) {
+	  if (!this.props.currentItem) {
 		this.setState({item: null})
 		return;
 	  }
-	  apiCall('entries/' + this.props.item, this.props.errorHandler)
+	  apiCall('entries/' + this.props.currentItem, this.props.errorHandler)
 	  .then(i => this.setState({item: i},
 		e => {}));
 	}
@@ -41,8 +41,8 @@ class ItemViewer extends React.Component {
 	  const content = {__html: item.content };
 	  return (
 		  <div>
-		<div className="itemheader">
-			<table className="itemheader">
+		    <div className="itemheader">
+			  <table className="itemheader">
 				<tbody>
 					<tr>
 						<td className="title">
@@ -64,10 +64,10 @@ class ItemViewer extends React.Component {
 						</td>
 					</tr>
 				</tbody>
-			</table>
-		</div>
-		<div className="itemcontent" dangerouslySetInnerHTML={content} />
-		</div>
+			  </table>
+		    </div>
+		    <div className="itemcontent" dangerouslySetInnerHTML={content} />
+		  </div>
 		);
 	}
   }
