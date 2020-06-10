@@ -1,4 +1,4 @@
-.settingsmodal {
+.modal {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -8,18 +8,18 @@
 	  padding: 10px;
 	  margin-right: -50%;
     transform: translate(-50%, -50%);
-  }
+}
 
-  .settingsoverlay {
+.overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     background-color: darkgray;
-  }
+}
 
- .settingsmodal input  { width: 350px; }
- .settingsmodal h3     { text-align: center; }
- .settingsmodal button { text-align: center }
-  
+.modal input  { width: 350px; }
+.modal h3     { text-align: center; }
+.modal button { text-align: center }
+table.keyhelp { text-align: center; padding: 5px }

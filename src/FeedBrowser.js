@@ -1,5 +1,6 @@
 import React from 'react';
 import './FeedBrowser.css';
+import Hotkeys from 'react-hot-keys';
 
 class FeedBrowser extends React.Component {
 	constructor(props) {
@@ -7,6 +8,16 @@ class FeedBrowser extends React.Component {
 	  this.handleCategoryClick = this.handleCategoryClick.bind(this);
 	  this.handleFeedClick = this.handleFeedClick.bind(this);
 	  this.unreadbubble = this.unreadbubble.bind(this);
+	  this.prevFeed = this.prevFeed.bind(this);
+	  this.nextFeed = this.nextFeed.bind(this);
+	}
+
+	onKeyDown(keyName, e, handle) {
+		switch(keyName) {
+			case "up": this.prevFeed(); break
+			case "down": this.nextFeed(); break
+			default: 
+		}
 	}
 
 	handleFeedClick(x) {
@@ -16,6 +27,24 @@ class FeedBrowser extends React.Component {
 	  this.props.onCategoryChange(x);
 	}
   
+	prevFeed() {
+		const i = this.props.currentFeed ? 
+			(Object.values(this.props.feeds).findIndex(x => x.id === this.props.currentFeed.id) - 1) : 
+			0;
+		if (i >= 0) {
+			this.props.onFeedChange(Object.values(this.props.feeds)[i]);
+		}
+	}
+
+	nextFeed() {
+		const i = this.props.currentFeed ? 
+			(Object.values(this.props.feeds).findIndex(x => x.id === this.props.currentFeed.id) + 1) : 
+			0;
+		if (i >= 0 && i < Object.values(this.props.feeds).length) {
+			this.props.onFeedChange(Object.values(this.props.feeds)[i]);
+		}
+	}
+
 	unreadbubble(i) {
 	  if (!i.unreads) { return }
 	  return <span className="unreadcount">{i.unreads}</span>;
@@ -26,6 +55,9 @@ class FeedBrowser extends React.Component {
 		  return <div>...</div>;
 	  }
 	  return (
+		<Hotkeys 
+        keyName="up,down" 
+        onKeyDown={this.onKeyDown.bind(this)}>
 		<div className="feedlist">
 
 			{Object.values(this.props.categories)
@@ -63,6 +95,7 @@ class FeedBrowser extends React.Component {
 				 </div>	
 			))}
 		</div>
+		</Hotkeys>
 	);
 	}
 }

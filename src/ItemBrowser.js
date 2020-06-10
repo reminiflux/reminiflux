@@ -2,6 +2,7 @@ import React from 'react';
 import {apiCall, relaTimestamp} from './lib/util';
 import './ItemBrowser.css';
 import SplitPane from 'react-split-pane';
+import Hotkeys from 'react-hot-keys';
 
 class ItemBrowser extends React.Component {
 	constructor(props) {
@@ -19,6 +20,32 @@ class ItemBrowser extends React.Component {
 	  this.toggleSort       = this.toggleSort.bind(this);
 	  this.markAllRead      = this.markAllRead.bind(this);
 	  this.handleClick      = this.handleClick.bind(this);
+	  this.prevItem         = this.prevItem.bind(this);
+	  this.nextItem         = this.nextItem.bind(this);
+	  
+	}
+	onKeyDown(keyName, e, handle) {
+		switch(keyName) {
+			case "p":
+			case "k":
+			case "left": 
+				this.prevItem();
+				break;
+			case "n":
+			case "j":
+			case "right": 
+				this.nextItem();
+				break;
+			case "m":
+				if (this.props.currentItem) {
+					this.toggleReadStatus(this.props.currentItem);
+				}
+				break;
+			case "shift+a":
+				this.markAllRead();
+				break;
+			default: 
+		}
 	}
 	componentDidMount() {
 	  this.fetch();
@@ -72,6 +99,9 @@ class ItemBrowser extends React.Component {
 	toggleReadStatus(item, read) {
 		const i = this.state.items;
 		const index = i.findIndex(x => x.id === item)
+		if (read === undefined) {
+			read = i[index].status === 'unread';
+		}
 		const newStatus = read ? 'read' : 'unread';
 		apiCall('entries', this.props.errorHandler, { 'entry_ids' : [item], 'status' : newStatus})
 		.then(() => {
@@ -90,6 +120,30 @@ class ItemBrowser extends React.Component {
 	toggleSort(v) {
 		this.setState({sort: v.target.value})
 		localStorage.setItem('sort', v.target.value);
+	}
+
+	prevItem() {
+		if (!this.props.currentFeed) {
+			return;
+		}
+		const i = this.props.currentItem ? 
+			(this.state.items.findIndex(x => x.id === this.props.currentItem) - 1) : 
+			0;
+		if (i >= 0) {
+			this.props.onItemChange(this.state.items[i].id);
+		}
+	}
+
+	nextItem() {
+		if (!this.props.currentFeed) {
+			return;
+		}
+		const i = this.props.currentItem ? 
+			(this.state.items.findIndex(x => x.id === this.props.currentItem) + 1) : 
+			0;
+		if (i >= 0 && i < this.state.items.length) {
+			this.props.onItemChange(this.state.items[i].id);
+		}
 	}
   
 	markAllRead() {
@@ -124,6 +178,9 @@ class ItemBrowser extends React.Component {
 	  
 	  
 	  return (
+		<Hotkeys 
+          keyName="p,k,left,n,j,right,m,shift+a" 
+          onKeyDown={this.onKeyDown.bind(this)}>
 		<SplitPane split="horizontal" minSize="26px" defaultSize="26px" allowResize={false} pane2Style={{ 'background': '#f5f5f5'}} >
         
 		<div className="itemlistcontrol">
@@ -175,6 +232,7 @@ class ItemBrowser extends React.Component {
 		</table>
 		</div>
 		</SplitPane>
+		</Hotkeys>
 		);
 	}
   }

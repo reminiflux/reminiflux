@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from 'react-modal';
-import './SettingsModal.css';
+import './Modals.css';
 
 class SettingsModal extends React.Component {
 	constructor(props) {
@@ -34,7 +34,7 @@ class SettingsModal extends React.Component {
   
 	render() {
 		return (
-		  <Modal isOpen={this.state.isOpen} ariaHideApp={false} className="settingsmodal" overlayClassName="settingsoverlay">
+		  <Modal isOpen={this.state.isOpen} ariaHideApp={false} className="modal" overlayClassName="overlay">
 		  <h3>Configure connection to Miniflux</h3>
 		  <p>
 			<b>Host</b> (without /v1, e.g. <i>https://miniflux.mydomain.tld</i>):

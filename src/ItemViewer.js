@@ -1,6 +1,7 @@
 import React from 'react';
 import {apiCall, formatDate} from './lib/util';
 import './ItemViewer.css';
+import Hotkeys from 'react-hot-keys';
 
 class ItemViewer extends React.Component {
 	constructor(props) {
@@ -10,6 +11,20 @@ class ItemViewer extends React.Component {
 	  };
 	  this.fetch = this.fetch.bind(this);
 	  this.handleStar = this.handleStar.bind(this);
+	}
+	onKeyDown(keyName, e, handle) {
+		switch(keyName) {
+			case "f":
+				this.handleStar();
+				break;
+			case "v":
+				window.open(this.state.item.url, '_blank');
+				break;
+			case "c":
+				window.open(this.state.item.comments_url || this.state.item.url, '_blank')
+				break;
+			default: 
+		}
 	}
 	componentDidMount() {
 	  this.fetch();
@@ -40,6 +55,9 @@ class ItemViewer extends React.Component {
 	  }
 	  const content = {__html: item.content };
 	  return (
+		<Hotkeys 
+		 keyName="f,v,c" 
+		 onKeyDown={this.onKeyDown.bind(this)}>
 		  <div>
 		    <div className="itemheader">
 			  <table className="itemheader">
@@ -68,6 +86,7 @@ class ItemViewer extends React.Component {
 		    </div>
 		    <div className="itemcontent" dangerouslySetInnerHTML={content} />
 		  </div>
+		</Hotkeys>
 		);
 	}
   }

@@ -6,6 +6,8 @@ import FeedBrowser from './FeedBrowser';
 import ItemBrowser from './ItemBrowser';
 import ItemViewer from './ItemViewer';
 import SettingsModal from './SettingsModal';
+import KeyHelpModal from './KeyHelpModal';
+import Hotkeys from 'react-hot-keys';
 
 class App extends React.Component {
   constructor(props) {
@@ -17,6 +19,7 @@ class App extends React.Component {
       feeds:           JSON.parse(localStorage.getItem('feeds')) || {},
       categories:      JSON.parse(localStorage.getItem('categories')) || {},
       settingsIsOpen:  !(localStorage.getItem('miniflux_server') && localStorage.getItem('miniflux_api_key')),
+      keyHelpIsOpen:   false,
       error:           null
     }
     this.changeFeed     = this.changeFeed.bind(this);
@@ -30,8 +33,25 @@ class App extends React.Component {
     this.closeSettings  = this.closeSettings.bind(this);
     this.errorHandler   = this.errorHandler.bind(this);
     this.clearError     = this.clearError.bind(this);
+    this.openKeyHelp    = this.openKeyHelp.bind(this);
+    this.closeKeyHelp   = this.closeKeyHelp.bind(this);
+
   }
-  
+  onKeyDown(keyName, e, handle) {
+		switch(keyName) {
+      case "h": this.openKeyHelp(); break;
+      case "enter":
+      case "esc":
+        if (this.state.settingsIsOpen) {
+          this.closeSettings();
+        } else if (this.state.keyHelpIsOpen) {
+          this.closeKeyHelp();
+        }
+        break;
+			default: 
+		}
+	}
+
   componentDidMount() {
     this.updateFeeds();
   }
@@ -150,6 +170,14 @@ class App extends React.Component {
     this.setState({settingsIsOpen: false });
   }
 
+  openKeyHelp() {
+    this.setState({keyHelpIsOpen: true});
+  }
+
+  closeKeyHelp() {
+    this.setState({keyHelpIsOpen : false})
+  }
+
   errorHandler(e) {
     this.setState({error: e})
   }
@@ -161,7 +189,11 @@ class App extends React.Component {
   render() {
 
     if (this.state.settingsIsOpen) {
-      return <SettingsModal onClose={this.closeSettings} />;
+      return <Hotkeys keyName="enter,esc" onKeyDown={this.onKeyDown.bind(this)}><SettingsModal onClose={this.closeSettings} /></Hotkeys>;
+    }
+
+    if (this.state.keyHelpIsOpen) {
+      return <Hotkeys keyName="enter,esc" onKeyDown={this.onKeyDown.bind(this)}><KeyHelpModal onClose={this.closeKeyHelp} /></Hotkeys>;
     }
 
     const currentFeed = this.state.currentFeed;
@@ -177,6 +209,9 @@ class App extends React.Component {
       : "";
 
     return (
+      <Hotkeys 
+      keyName="h,enter,esc" 
+      onKeyDown={this.onKeyDown.bind(this)}>
       <div>
       {errorStatus}
       <SplitPane split="vertical" minSize={300} 
@@ -211,6 +246,7 @@ class App extends React.Component {
         </SplitPane>
       </SplitPane>
       </div>
+      </Hotkeys>
     );
   }
 }
