@@ -35,7 +35,7 @@ class KeyHelpModal extends React.Component {
 				  <tr><td>Up</td><td>Open previous feed</td></tr>
 				  <tr><td>Down</td><td>Open next feed</td></tr>
 				  <tr><td>Left/p/k</td><td>Open previous item</td></tr>
-				  <tr><td>Right/n/j</td><td>Open next item</td></tr>
+				  <tr><td>Right/n/j/Space</td><td>Open next item</td></tr>
 				  <tr><td>Home</td><td>Open first item</td></tr>
 				  <tr><td>End</td><td>Open first item</td></tr>
 				  <tr><td>m</td><td>Mark item as read/unread</td></tr>

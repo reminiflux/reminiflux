@@ -26,25 +26,32 @@ class ItemBrowser extends React.Component {
 	  this.lastItem         = this.lastItem.bind(this);
 	  this.currentRef       = React.createRef();
 	}
+	scrollToCurrent() {
+		if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'}); }
+	}
 	onKeyDown(keyName, e, handle) {
 		switch(keyName) {
 			case "p":
 			case "k":
 			case "left": 
 				this.prevItem();
+				this.scrollToCurrent();
 				break;
 			case "n":
 			case "j":
 			case "right": 
 			case "space":
 				this.nextItem();
+				this.scrollToCurrent();
 				e.preventDefault();
 				break;
 			case "home":
 				this.firstItem();
+				this.scrollToCurrent();
 				break;
 			case "end":
 				this.lastItem();
+				this.scrollToCurrent();
 				break;
 			case "u":
 				this.toggleFilter();
@@ -77,7 +84,6 @@ class ItemBrowser extends React.Component {
 		  this.props.currentItem) {
 		  this.toggleReadStatus(this.props.currentItem, true);
 	  }
-	  if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'}); }
 	}
 
 	getFeeds() {

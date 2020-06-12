@@ -12,17 +12,23 @@ class FeedBrowser extends React.Component {
 	  this.nextFeed            = this.nextFeed.bind(this);
 	  this.currentRef          = React.createRef();
 	}
-
+	scrollToCurrent() {
+		if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'}); }
+	}
 	onKeyDown(keyName, e, handle) {
 		switch(keyName) {
-			case "up": this.prevFeed(); break
-			case "down": this.nextFeed(); break
+			case "up":
+				this.prevFeed();
+				this.scrollToCurrent();
+				e.preventDefault();
+				break
+			case "down":
+				this.nextFeed();
+				this.scrollToCurrent();
+				e.preventDefault();
+				break
 			default: 
 		}
-	}
-
-	componentDidUpdate() {
-		if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'});  }
 	}
 
 	handleFeedClick(x) {
