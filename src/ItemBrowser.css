@@ -4,7 +4,7 @@ div.itemlisttitle { display: inline-block; font-weight: bold; font-size: 120%;
 span.titlecounter { font-weight: normal ; font-size: 90% }
 .itemlisttitle a { text-decoration: none; color: inherit }
 div.itemlistcontrolbuttons { float: right; }
-.itemlistcontrolbuttons button { height: 20px; font-size: 90%  }
+.itemlistcontrolbuttons button { height: 20px; font-size: 90%; width: 40px  }
 
 div.itemlist { padding: 5px }
 table.itemlist { border: none; border-collapse: collapse; width: 100%; table-layout: fixed }

@@ -252,9 +252,9 @@ class ItemBrowser extends React.Component {
 			{ this.feedlink(this.props.currentFeed || this.props.currentCategory, items) }
 			
 			<div className="itemlistcontrolbuttons">
-			  <button onClick={this.markAllRead}> &#10003; Mark all as read</button>
-			  <button onClick={this.markReadUntil}> &#11123; until selected</button>
-			  <button onClick={this.markReadAfter}> &#11121; after selected</button>
+			  <button onClick={this.markAllRead} title="Mark all as read"> &#10003; </button>
+			  <button onClick={this.markReadUntil} title="Mark all until selection as read"> &#11123; </button>
+			  <button onClick={this.markReadAfter} title="Mark all after selection as read"> &#11121; </button>
 			  <select onChange={this.toggleFilter} value={this.state.filter}>
 				  <option value='u'>Show unread only</option>
 				  <option value='a'>Show all</option>
