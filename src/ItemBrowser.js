@@ -18,7 +18,10 @@ class ItemBrowser extends React.Component {
 	  this.toggleReadStatus = this.toggleReadStatus.bind(this);
 	  this.toggleFilter     = this.toggleFilter.bind(this);
 	  this.toggleSort       = this.toggleSort.bind(this);
+	  this.markRead         = this.markRead.bind(this);
 	  this.markAllRead      = this.markAllRead.bind(this);
+	  this.markReadUntil    = this.markReadUntil.bind(this);
+	  this.markReadAfter    = this.markReadAfter.bind(this);
 	  this.handleClick      = this.handleClick.bind(this);
 	  this.prevItem         = this.prevItem.bind(this);
 	  this.nextItem         = this.nextItem.bind(this);
@@ -184,14 +187,36 @@ class ItemBrowser extends React.Component {
 			this.props.onItemChange(this.state.items[this.state.items.length - 1].id);
 		}
 	}
- 
-	markAllRead() {
-		if (this.state.items.length > 0) {
-			apiCall('entries', this.props.errorHandler, { 'entry_ids' : this.state.items.map(x => x.id), 'status' : 'read'})
+
+	markRead(items) {
+		if (items.length > 0) {
+			apiCall('entries', this.props.errorHandler, { 'entry_ids' : items.map(x => x.id), 'status' : 'read'})
 			.then(() => { 
 				this.getFeeds().forEach(f => this.props.updateUnread(f));
 				this.fetch(); },
 			e => {});
+		}
+	}
+
+	markAllRead() {
+		this.markRead(this.state.items)
+	}
+
+	markReadUntil() {
+		const i = this.props.currentItem ? 
+			this.state.items.findIndex(x => x.id === this.props.currentItem) : 
+			-1;
+		if (i >= 0) {
+			this.markRead(this.state.items.slice(0, i + 1));
+		}
+	}
+
+	markReadAfter() {
+		const i = this.props.currentItem ? 
+			this.state.items.findIndex(x => x.id === this.props.currentItem)  : 
+			-1;
+		if (i >= 0) {
+			this.markRead(this.state.items.slice(i));
 		}
 	}
 
@@ -228,6 +253,8 @@ class ItemBrowser extends React.Component {
 			
 			<div className="itemlistcontrolbuttons">
 			  <button onClick={this.markAllRead}> &#10003; Mark all as read</button>
+			  <button onClick={this.markReadUntil}> &#11123; until selected</button>
+			  <button onClick={this.markReadAfter}> &#11121; after selected</button>
 			  <select onChange={this.toggleFilter} value={this.state.filter}>
 				  <option value='u'>Show unread only</option>
 				  <option value='a'>Show all</option>
