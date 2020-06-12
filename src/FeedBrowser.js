@@ -6,10 +6,11 @@ class FeedBrowser extends React.Component {
 	constructor(props) {
 	  super(props);
 	  this.handleCategoryClick = this.handleCategoryClick.bind(this);
-	  this.handleFeedClick = this.handleFeedClick.bind(this);
-	  this.unreadbubble = this.unreadbubble.bind(this);
-	  this.prevFeed = this.prevFeed.bind(this);
-	  this.nextFeed = this.nextFeed.bind(this);
+	  this.handleFeedClick     = this.handleFeedClick.bind(this);
+	  this.unreadbubble        = this.unreadbubble.bind(this);
+	  this.prevFeed            = this.prevFeed.bind(this);
+	  this.nextFeed            = this.nextFeed.bind(this);
+	  this.currentRef          = React.createRef();
 	}
 
 	onKeyDown(keyName, e, handle) {
@@ -20,9 +21,14 @@ class FeedBrowser extends React.Component {
 		}
 	}
 
+	componentDidUpdate() {
+		if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'});  }
+	}
+
 	handleFeedClick(x) {
 	  this.props.onFeedChange(x);
 	}
+
 	handleCategoryClick(x) {
 	  this.props.onCategoryChange(x);
 	}
@@ -80,7 +86,8 @@ class FeedBrowser extends React.Component {
 				    .map(f => (
 					<div className={`feedrow
 						 ${f.id === (this.props.currentFeed ? this.props.currentFeed.id : null) ? "selected" : ""}
-						 `}
+						 `} 
+						 ref={f.id === (this.props.currentFeed ? this.props.currentFeed.id : null) ? this.currentRef : undefined}
 						 onClick={() => this.handleFeedClick(f)} key={f.id}>
 					  <img className="favico" src={f.icon_data} alt="" />
 					  <div className={`feed 

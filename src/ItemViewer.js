@@ -11,6 +11,7 @@ class ItemViewer extends React.Component {
 	  };
 	  this.fetch = this.fetch.bind(this);
 	  this.handleStar = this.handleStar.bind(this);
+	  this.topRef = React.createRef();
 	}
 	onKeyDown(keyName, e, handle) {
 		switch(keyName) {
@@ -33,6 +34,7 @@ class ItemViewer extends React.Component {
 	  if (prevProps.currentItem !== this.props.currentItem) {
 		this.fetch();
 	  }
+	  if (this.topRef.current) { this.topRef.current.scrollIntoView(); }
 	}
 	fetch() {
 	  if (!this.props.currentItem) {
@@ -58,7 +60,7 @@ class ItemViewer extends React.Component {
 		<Hotkeys 
 		 keyName="f,v,c" 
 		 onKeyDown={this.onKeyDown.bind(this)}>
-		  <div>
+		  <div ref={this.topRef}>
 		    <div className="itemheader">
 			  <table className="itemheader">
 				<tbody>

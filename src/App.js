@@ -35,16 +35,15 @@ class App extends React.Component {
     this.clearError     = this.clearError.bind(this);
     this.openKeyHelp    = this.openKeyHelp.bind(this);
     this.closeKeyHelp   = this.closeKeyHelp.bind(this);
-
   }
   onKeyDown(keyName, e, handle) {
 		switch(keyName) {
-      case "h": this.openKeyHelp(); break;
+      case "h":
+        this.openKeyHelp();
+        break;
       case "enter":
       case "esc":
-        if (this.state.settingsIsOpen) {
-          this.closeSettings();
-        } else if (this.state.keyHelpIsOpen) {
+        if (this.state.keyHelpIsOpen) {
           this.closeKeyHelp();
         }
         break;
@@ -121,6 +120,8 @@ class App extends React.Component {
       })
     }
 
+    setIcon(this, defaulticon);
+
     const cache = JSON.parse(localStorage.getItem('favicons')) || {};
     if (f.icon) {
       if (f.id in cache) {
@@ -135,8 +136,6 @@ class App extends React.Component {
         },
         e => {})
       }
-    } else {
-      setIcon(this, defaulticon);
     }
   }
 
@@ -168,6 +167,7 @@ class App extends React.Component {
 
   closeSettings() {
     this.setState({settingsIsOpen: false });
+    this.updateFeeds();
   }
 
   openKeyHelp() {
@@ -189,7 +189,7 @@ class App extends React.Component {
   render() {
 
     if (this.state.settingsIsOpen) {
-      return <Hotkeys keyName="enter,esc" onKeyDown={this.onKeyDown.bind(this)}><SettingsModal onClose={this.closeSettings} /></Hotkeys>;
+      return <SettingsModal onClose={this.closeSettings} />;
     }
 
     if (this.state.keyHelpIsOpen) {
@@ -233,6 +233,7 @@ class App extends React.Component {
               defaultSize={parseInt(localStorage.getItem('h_split')) || "40%"}
               onChange={size => localStorage.setItem('h_split', size)}>
           <ItemBrowser
+            ref={this.itembrowserref}
             currentFeed={currentFeed}
             currentCategory={currentCategory}
             currentItem={currentItem} 

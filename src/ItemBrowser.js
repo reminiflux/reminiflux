@@ -22,7 +22,9 @@ class ItemBrowser extends React.Component {
 	  this.handleClick      = this.handleClick.bind(this);
 	  this.prevItem         = this.prevItem.bind(this);
 	  this.nextItem         = this.nextItem.bind(this);
-	  
+	  this.firstItem        = this.firstItem.bind(this);
+	  this.lastItem         = this.lastItem.bind(this);
+	  this.currentRef       = React.createRef();
 	}
 	onKeyDown(keyName, e, handle) {
 		switch(keyName) {
@@ -34,7 +36,21 @@ class ItemBrowser extends React.Component {
 			case "n":
 			case "j":
 			case "right": 
+			case "space":
 				this.nextItem();
+				e.preventDefault();
+				break;
+			case "home":
+				this.firstItem();
+				break;
+			case "end":
+				this.lastItem();
+				break;
+			case "u":
+				this.toggleFilter();
+				break;
+			case "s":
+				this.toggleSort();
 				break;
 			case "m":
 				if (this.props.currentItem) {
@@ -61,6 +77,7 @@ class ItemBrowser extends React.Component {
 		  this.props.currentItem) {
 		  this.toggleReadStatus(this.props.currentItem, true);
 	  }
+	  if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'}); }
 	}
 
 	getFeeds() {
@@ -88,8 +105,14 @@ class ItemBrowser extends React.Component {
 		'limit=' + (parseInt(localStorage.getItem('fetch_limit')) || 100) +
 		'&order=published_at&direction=' + (this.state.sort === 'n' ? 'desc' : 'asc') + 
 		(this.state.filter === 'u' ? '&status=unread' : ''), this.props.errorHandler)
-		.then(i => this.setState({items: this.state.items.concat(i ? i.entries : [])}),
-		e => {});
+		.then(i => {
+			const currentFeeds = this.getFeeds().map(f => f.id);
+			const newItems = i ? 
+			i.entries.filter(item => (currentFeeds.indexOf(item.feed.id) >= 0)) :
+			[];
+			this.setState({items: this.state.items.concat(newItems)});
+		},
+		e => {})
 	}
 
 	handleClick(item) {
@@ -113,39 +136,49 @@ class ItemBrowser extends React.Component {
 	}
 
 	toggleFilter(v) {
-		this.setState({filter: v.target.value});
-		localStorage.setItem('filter', v.target.value);
+		const filter = v ? v.target.value : (this.state.filter === 'u' ? 'a' : 'u')
+		this.setState({filter: filter});
+		localStorage.setItem('filter', filter);
+		if (v) { v.target.blur(); }
 	}
 
 	toggleSort(v) {
-		this.setState({sort: v.target.value})
-		localStorage.setItem('sort', v.target.value);
+		const sort = v ? v.target.value : (this.state.sort === 'n' ? 'o' : 'n')
+		this.setState({sort: sort})
+		localStorage.setItem('sort', sort);
+		if (v) { v.target.blur(); }
 	}
 
 	prevItem() {
-		if (!this.props.currentFeed) {
-			return;
-		}
 		const i = this.props.currentItem ? 
 			(this.state.items.findIndex(x => x.id === this.props.currentItem) - 1) : 
 			0;
-		if (i >= 0) {
+		if (this.state.items.length > 0 && i >= 0) {
 			this.props.onItemChange(this.state.items[i].id);
 		}
 	}
 
 	nextItem() {
-		if (!this.props.currentFeed) {
-			return;
-		}
 		const i = this.props.currentItem ? 
 			(this.state.items.findIndex(x => x.id === this.props.currentItem) + 1) : 
 			0;
-		if (i >= 0 && i < this.state.items.length) {
+		if (this.state.items.length > 0 && i >= 0 && i < this.state.items.length) {
 			this.props.onItemChange(this.state.items[i].id);
 		}
 	}
-  
+
+	firstItem() {
+		if (this.state.items.length > 0) {
+			this.props.onItemChange(this.state.items[0].id);
+		}
+	}
+
+	lastItem() {
+		if (this.state.items.length > 0) {
+			this.props.onItemChange(this.state.items[this.state.items.length - 1].id);
+		}
+	}
+ 
 	markAllRead() {
 		if (this.state.items.length > 0) {
 			apiCall('entries', this.props.errorHandler, { 'entry_ids' : this.state.items.map(x => x.id), 'status' : 'read'})
@@ -179,7 +212,7 @@ class ItemBrowser extends React.Component {
 	  
 	  return (
 		<Hotkeys 
-          keyName="p,k,left,n,j,right,m,shift+a" 
+          keyName="p,k,left,n,j,right,m,shift+a,home,end,u,s,space" 
           onKeyDown={this.onKeyDown.bind(this)}>
 		<SplitPane split="horizontal" minSize="26px" defaultSize="26px" allowResize={false} pane2Style={{ 'background': '#f5f5f5'}} >
         
@@ -213,6 +246,7 @@ class ItemBrowser extends React.Component {
 			  ${item.id === this.props.currentItem ? "selected" : ""}
 			  ${item.status === 'unread' ? 'unread' : 'read'}
 			  `} 
+			  ref={item.id === this.props.currentItem ? this.currentRef : undefined} 
 			  key={item.id}>
 			  <td className="favico">
 			  <img className="minifavico" src={this.props.feeds[item.feed.id].icon_data} alt="" />
@@ -222,7 +256,7 @@ class ItemBrowser extends React.Component {
 				       title="Toggle read"
 				       onClick={() => this.toggleReadStatus(item.id, item.status === 'unread' ? true : false)} />
 			  </td>
-			  <td className="title"     onClick={() => this.handleClick(item.id)}>{item.title}</td>
+			  <td className="title" onClick={() => this.handleClick(item.id)}>{item.title}</td>
 			  <td className="timestamp" 
 			    title={item.published_at}
 			    onClick={() => this.handleClick(item.id)}>{relaTimestamp(item.published_at)}</td>
