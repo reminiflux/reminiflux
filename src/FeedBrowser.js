@@ -5,11 +5,15 @@ import Hotkeys from 'react-hot-keys';
 class FeedBrowser extends React.Component {
 	constructor(props) {
 	  super(props);
+	  this.state = {
+		tree: []
+	  }
 	  this.handleCategoryClick = this.handleCategoryClick.bind(this);
 	  this.handleFeedClick     = this.handleFeedClick.bind(this);
 	  this.unreadbubble        = this.unreadbubble.bind(this);
 	  this.prevFeed            = this.prevFeed.bind(this);
 	  this.nextFeed            = this.nextFeed.bind(this);
+	  this.compileTree         = this.compileTree.bind(this);
 	  this.currentRef          = React.createRef();
 	}
 	scrollToCurrent() {
@@ -31,6 +35,26 @@ class FeedBrowser extends React.Component {
 		}
 	}
 
+	componentDidUpdate(prevProps) {
+		if (prevProps.feeds !== this.props.feeds || 
+			prevProps.categories !== this.props.categories) {
+			this.setState({tree: this.compileTree()});
+		}
+	}
+
+	compileTree() {
+		const tree = [];
+		Object.values(this.props.categories)
+		.sort((a,b) => a.title.localeCompare(b.title))
+		.forEach(c => {
+			tree.push(c);
+			tree.push(...Object.values(this.props.feeds)
+			.filter(f => f.category.id === c.id)
+			.sort((a,b) => a.title.localeCompare(b.title)))
+		});
+		return tree;
+	}
+
 	handleFeedClick(x) {
 	  this.props.onFeedChange(x);
 	}
@@ -40,20 +64,37 @@ class FeedBrowser extends React.Component {
 	}
   
 	prevFeed() {
-		const i = this.props.currentFeed ? 
-			(Object.values(this.props.feeds).findIndex(x => x.id === this.props.currentFeed.id) - 1) : 
-			0;
-		if (i >= 0) {
-			this.props.onFeedChange(Object.values(this.props.feeds)[i]);
+		if (this.state.tree.length === 0) {
+			return
 		}
+
+		const i = this.props.currentFeed ? 
+		  this.state.tree.indexOf(this.props.currentFeed) :
+		  this.state.tree.indexOf(this.props.currentCategory);
+		
+		const prev = this.state.tree[ (i-1) >= 0 ? (i-1) : 0 ];
+		if (prev.category) {
+			this.props.onFeedChange(prev);
+		} else {
+			this.props.onCategoryChange(prev);
+		}
+		
 	}
 
 	nextFeed() {
+		if (this.state.tree.length === 0) {
+			return
+		}
+
 		const i = this.props.currentFeed ? 
-			(Object.values(this.props.feeds).findIndex(x => x.id === this.props.currentFeed.id) + 1) : 
-			0;
-		if (i >= 0 && i < Object.values(this.props.feeds).length) {
-			this.props.onFeedChange(Object.values(this.props.feeds)[i]);
+		  this.state.tree.indexOf(this.props.currentFeed) :
+		  this.state.tree.indexOf(this.props.currentCategory);
+		
+	    const prev = this.state.tree[ (i+1) < this.state.tree.length ? (i+1) : this.state.tree.length -1 ];
+		if (prev.category) {
+			this.props.onFeedChange(prev);
+		} else {
+			this.props.onCategoryChange(prev);
 		}
 	}
 
@@ -72,41 +113,44 @@ class FeedBrowser extends React.Component {
         onKeyDown={this.onKeyDown.bind(this)}>
 		<div className="feedlist">
 
-			{Object.values(this.props.categories)
-			.sort((a,b) => a.title.localeCompare(b.title))
-			.map(category => (
-				<div key={category.id}>
-				    <div className={`categoryrow
-						 ${category.id === (this.props.currentCategory ? this.props.currentCategory.id : null) ? "selected" : ""}
-						 `}
-						 onClick={() => this.handleCategoryClick(category)}>
-				      <div className="category">
-					    {category.title}
-					    {this.unreadbubble(category)}
-				      </div>
-				    </div>
-
-				    {Object.values(this.props.feeds)
-				    .filter(f => (f.category.id === category.id))
-				    .sort((a,b) => a.title.localeCompare(b.title))
-				    .map(f => (
-					<div className={`feedrow
-						 ${f.id === (this.props.currentFeed ? this.props.currentFeed.id : null) ? "selected" : ""}
-						 `} 
-						 ref={f.id === (this.props.currentFeed ? this.props.currentFeed.id : null) ? this.currentRef : undefined}
-						 onClick={() => this.handleFeedClick(f)} key={f.id}>
-					  <img className="favico" src={f.icon_data} alt="" />
-					  <div className={`feed 
-					   	   ${f.parsing_error_count > 0 ? "errorfeed" : ""}
-						   `}
-					       title={f.parsing_error_message} >
-					    {f.title}
-					    {this.unreadbubble(f)}
+			{this.state.tree
+			.map(item => {
+				if (!item.category) {
+					return (
+					  <div key={"c" + item.id}>
+						<div className={`categoryrow
+						  ${item.id === (this.props.currentCategory ? this.props.currentCategory.id : null) ? "selected" : ""}
+						  `}
+						ref={item.id === (this.props.currentCategory ? this.props.currentCategory.id : null) ? this.currentRef : undefined}
+						onClick={() => this.handleCategoryClick(item)}>
+					 		<div className="category">
+					   			{item.title}
+					   			{this.unreadbubble(item)}
+					 		</div>
+				   		</div>	   
 					  </div>
-					</div>
-					))}
-				 </div>	
-			))}
+					)
+				} else {
+					return (
+					  <div key={item.id}>
+						<div className={`feedrow
+						  ${item.id === (this.props.currentFeed ? this.props.currentFeed.id : null) ? "selected" : ""}
+						  `} 
+						ref={item.id === (this.props.currentFeed ? this.props.currentFeed.id : null) ? this.currentRef : undefined}
+						onClick={() => this.handleFeedClick(item)}>
+					 		<img className="favico" src={item.icon_data} alt="" />
+					 		<div className={`feed 
+								 ${item.parsing_error_count > 0 ? "errorfeed" : ""}
+						  		`}
+						  		title={item.parsing_error_message} >
+					   			{item.title}
+					   			{this.unreadbubble(item)}
+					 		</div>
+						</div>
+					  </div>   
+	   				)
+				}
+			})}
 		</div>
 		</Hotkeys>
 	);

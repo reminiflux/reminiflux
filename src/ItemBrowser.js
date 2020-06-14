@@ -100,6 +100,7 @@ class ItemBrowser extends React.Component {
 		return fs;
   
 	}
+
 	fetch() {
 	  this.setState({items: []});
 	  this.getFeeds().forEach(f => {
@@ -108,18 +109,20 @@ class ItemBrowser extends React.Component {
 		  }
 		});
 	}
-
+	
 	fetchFeed(f) {
 		apiCall('feeds/' + f.id + '/entries?' +
 		'limit=' + (parseInt(localStorage.getItem('fetch_limit')) || 100) +
 		'&order=published_at&direction=' + (this.state.sort === 'n' ? 'desc' : 'asc') + 
 		(this.state.filter === 'u' ? '&status=unread' : ''), this.props.errorHandler)
 		.then(i => {
-			const currentFeeds = this.getFeeds().map(f => f.id);
-			const newItems = i ? 
-			i.entries.filter(item => (currentFeeds.indexOf(item.feed.id) >= 0)) :
-			[];
-			this.setState({items: this.state.items.concat(newItems)});
+			this.setState(state => {
+				const currentFeeds = this.getFeeds().map(f => f.id);
+				return {items: state.items.concat(i.entries.filter((x,p) => 
+							currentFeeds.indexOf(x.feed.id) >= 0 &&
+							state.items.map(y => y.id).indexOf(x.id) < 0)
+						 )
+						}});
 		},
 		e => {})
 	}
