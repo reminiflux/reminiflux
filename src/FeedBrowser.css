@@ -12,6 +12,6 @@ div.feedrow.selected { background-color: lightslategrey; }
 div.feed.read { color: lightgray }
 img.favico { width: 16px; height: 16px; vertical-align: middle }
 
-.errorfeed { background-color: lightcoral }
+.errorfeed {color: red }
 .feed span.unreadcount { margin-left: 10px; background-color: #2a89bc; border: 1px solid #2a89bc; float: right; position: relative; border-radius: 4px; font-weight: bold; text-align: center; font-size: 10px; color: white; min-width: 20px}
 .category span.unreadcount { margin-left: 10px; background-color: #454545; border: 1px solid #454545; float: right; position: relative; border-radius: 4px; font-weight: bold; text-align: center; font-size: 10px; color: white; min-width: 20px}

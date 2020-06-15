@@ -13,8 +13,6 @@ class ItemBrowser extends React.Component {
 		sort:   localStorage.getItem('sort') || 'n'
 	  };
 	  this.fetch            = this.fetch.bind(this);
-	  this.getFeeds         = this.getFeeds.bind(this);
-	  this.fetchFeed        = this.fetchFeed.bind(this);
 	  this.toggleReadStatus = this.toggleReadStatus.bind(this);
 	  this.toggleFilter     = this.toggleFilter.bind(this);
 	  this.toggleSort       = this.toggleSort.bind(this);
@@ -78,7 +76,6 @@ class ItemBrowser extends React.Component {
 	}
 	componentDidUpdate(prevProps, prevState) {
 	  if (prevProps.currentFeed !== this.props.currentFeed || 
-		  prevProps.currentCategory !== this.props.currentCategory || 
 	      ((prevState.sort !== this.state.sort) && this.state.items.length > 100) ||
 		  prevState.filter !== this.state.filter) {
 		this.fetch();
@@ -89,43 +86,30 @@ class ItemBrowser extends React.Component {
 	  }
 	}
 
-	getFeeds() {
-		var fs = [];
-		if (this.props.currentFeed) {
-			fs = [this.props.currentFeed];
-		} else if (this.props.currentCategory) {
-			fs = Object.values(this.props.feeds)
-			.filter(f => f.category.id === this.props.currentCategory.id)
-		}
-		return fs;
-  
-	}
-
 	fetch() {
-	  this.setState({items: []});
-	  this.getFeeds().forEach(f => {
-		  if (f.unreads > 0 || this.state.filter === 'a') {
-			  this.fetchFeed(f)
-		  }
-		});
-	}
-	
-	fetchFeed(f) {
-		apiCall('feeds/' + f.id + '/entries?' +
-		'limit=' + (parseInt(localStorage.getItem('fetch_limit')) || 100) +
-		'&order=published_at&direction=' + (this.state.sort === 'n' ? 'desc' : 'asc') + 
-		(this.state.filter === 'u' ? '&status=unread' : ''), this.props.errorHandler)
-		.then(i => {
-			this.setState(state => {
-				const currentFeeds = this.getFeeds().map(f => f.id);
-				return {items: state.items.concat(i.entries.filter((x,p) => 
-							currentFeeds.indexOf(x.feed.id) >= 0 &&
-							state.items.map(y => y.id).indexOf(x.id) < 0)
-						 )
-						}});
-		},
-		e => {})
-	}
+	  if (!this.props.currentFeed) {
+		  return
+	  }
+	  const urls = this.props.currentFeed.fetch_url ?
+	    [this.props.currentFeed.fetch_url] :
+	    this.props.feeds
+	     .filter(f => f.category) 
+	     .filter(f => f.category.id === this.props.currentFeed.id).map(f => f.fetch_url);
+
+	  Promise.all(urls.map(u => 
+		apiCall(u + 
+			(u.includes('?') ? '&' : '?') +
+		    'limit=' + (parseInt(localStorage.getItem('fetch_limit')) || 100) +
+		    '&order=published_at&direction=' + (this.state.sort === 'n' ? 'desc' : 'asc') + 
+		    (this.state.filter === 'u' ? '&status=unread' : ''), this.props.errorHandler)
+	  ))
+	  .then(feeds => {
+		  const items = [];
+		  feeds.forEach(f => items.push(...f.entries));
+		  this.setState({items: items})
+	  },
+	  e => {})
+    }
 
 	handleClick(item) {
 		this.props.onItemChange(item);
@@ -142,7 +126,7 @@ class ItemBrowser extends React.Component {
 		.then(() => {
 			i[index].status = newStatus;
 			this.setState({items: i});
-			this.props.updateUnread(i[index].feed);
+			this.props.updateUnread(i[index].feed.id);
 		},
 		e => {});
 	}
@@ -194,8 +178,11 @@ class ItemBrowser extends React.Component {
 	markRead(items) {
 		if (items.length > 0) {
 			apiCall('entries', this.props.errorHandler, { 'entry_ids' : items.map(x => x.id), 'status' : 'read'})
-			.then(() => { 
-				this.getFeeds().forEach(f => this.props.updateUnread(f));
+			.then(() => {
+				items
+				.map(x => x.feed.id)
+				.filter((f,index,self) => self.indexOf(f) === index)
+				.forEach(f => this.props.updateUnread(f));
 				this.fetch(); },
 			e => {});
 		}
@@ -242,8 +229,7 @@ class ItemBrowser extends React.Component {
 
 	render() {
 	  const items = this.state.items;
-	  
-	  
+
 	  return (
 		<Hotkeys 
           keyName="p,k,left,n,j,right,m,shift+a,home,end,u,s,space" 
@@ -285,7 +271,7 @@ class ItemBrowser extends React.Component {
 			  ref={item.id === this.props.currentItem ? this.currentRef : undefined} 
 			  key={item.id}>
 			  <td className="favico">
-			  <img className="minifavico" src={this.props.feeds[item.feed.id].icon_data} alt="" />
+			  <img className="minifavico" src={this.props.feeds.find(f => f.id === item.feed.id && f.category).icon_data} alt="" />
 			  </td>
 			  <td className="readstatus">
 				  <div className={item.status === 'unread' ? 'unreaddot' : 'readdot'} 

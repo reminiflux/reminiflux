@@ -14,28 +14,28 @@ class App extends React.Component {
     super(props);
     this.state = {
       currentFeed:     null,
-      currentCategory: null,
       currentItem:     null,
-      feeds:           JSON.parse(localStorage.getItem('feeds')) || {},
-      categories:      JSON.parse(localStorage.getItem('categories')) || {},
+      feeds:           Array.isArray(JSON.parse(localStorage.getItem('feeds'))) ? JSON.parse(localStorage.getItem('feeds')) : [],
       settingsIsOpen:  !(localStorage.getItem('miniflux_server') && localStorage.getItem('miniflux_api_key')),
       keyHelpIsOpen:   false,
       error:           null
     }
-    this.changeFeed     = this.changeFeed.bind(this);
-    this.changeCategory = this.changeCategory.bind(this);
-    this.changeItem     = this.changeItem.bind(this);
-    this.updateFeeds    = this.updateFeeds.bind(this);
-    this.updateUnread   = this.updateUnread.bind(this);
-    this.updateIcon     = this.updateIcon.bind(this);
-    this.refresh        = this.refresh.bind(this);
-    this.openSettings   = this.openSettings.bind(this);
-    this.closeSettings  = this.closeSettings.bind(this);
-    this.errorHandler   = this.errorHandler.bind(this);
-    this.clearError     = this.clearError.bind(this);
-    this.openKeyHelp    = this.openKeyHelp.bind(this);
-    this.closeKeyHelp   = this.closeKeyHelp.bind(this);
+    this.changeFeed       = this.changeFeed.bind(this);
+    this.changeItem       = this.changeItem.bind(this);
+    this.updateFeeds      = this.updateFeeds.bind(this);
+    this.updateUnread     = this.updateUnread.bind(this);
+    this.updateUnreadById = this.updateUnreadById.bind(this);
+    this.updateIcon       = this.updateIcon.bind(this);
+    
+    this.refresh          = this.refresh.bind(this);
+    this.openSettings     = this.openSettings.bind(this);
+    this.closeSettings    = this.closeSettings.bind(this);
+    this.errorHandler     = this.errorHandler.bind(this);
+    this.clearError       = this.clearError.bind(this);
+    this.openKeyHelp      = this.openKeyHelp.bind(this);
+    this.closeKeyHelp     = this.closeKeyHelp.bind(this);
   }
+
   onKeyDown(keyName, e, handle) {
 		switch(keyName) {
       case "h":
@@ -59,19 +59,35 @@ class App extends React.Component {
     apiCall('feeds', this.errorHandler)
     .then(
       f => {
-        this.setState({
-          feeds: f.reduce((m, o) => {m[o.id] = o; return m}, {}), 
-          categories: f.reduce((m, o) => {m[o.category.id] = o.category; return m}, {}), },
-          () => {
-            localStorage.setItem('feeds', JSON.stringify(this.state.feeds));
-            localStorage.setItem('categories', JSON.stringify(this.state.categories));
+        let categories = [];
+        f.forEach(x => {
+          if (categories.map(c => c.id).indexOf(x.category.id) < 0) {
+            categories.push(x.category);
+          }
+        })
+        
+        const feedTree = 
+        [ { 'id': -1, 'title' : 'All', 'fetch_url' : '/entries', 'unreads' : 0 },
+          { 'id': -2, 'title' : 'Starred', 'fetch_url' : '/entries?starred=true', 'unreads' : 0 } ]
+        
+        categories
+        .sort((a,b) => a.title.localeCompare(b.title))
+        .forEach(c => {
+            feedTree.push(c);
+            feedTree.push(...f
+            .filter(f => f.category.id === c.id)
+            .sort((a,b) => a.title.localeCompare(b.title))
+            .map(f => Object.assign(f, { 'fetch_url' : 'feeds/' + f.id + '/entries' })))
           });
-        return f;
+        this.setState({ feeds: feedTree });
+        localStorage.setItem('feeds', JSON.stringify(feedTree));
+        return feedTree;
       },
       e => {})
     .then(
       f => { if (f) {
-        f.forEach(feed => { 
+        f
+        .forEach(feed => { 
           this.updateUnread(feed);
           this.updateIcon(feed);
         })
@@ -80,42 +96,58 @@ class App extends React.Component {
   }
 
   updateUnread(f) {
-    apiCall('feeds/' + f.id + '/entries?status=unread&limit=1', this.errorHandler)
+    
+    if (!f.fetch_url) {
+      return
+    }
+
+    apiCall(f.fetch_url + (f.fetch_url.includes('?') ? '&' : '?') + 'status=unread&limit=1', this.errorHandler)
     .then(r => {
         this.setState(state => {
           const feeds = state.feeds;
-          feeds[f.id]['unreads'] = r.total;
+          feeds[feeds.indexOf(f)]['unreads'] = r.total;
           return {feeds: feeds}
         });
         return this.state.feeds;
-      })
+     })
     .then(feeds => {
-      document.title = Object.values(feeds)
+      document.title = feeds
+      .filter(f => f.id > 0 && f.category)
       .reduce((a, b) => { return a + (b['unreads'] || 0)}, 0) + " | reminiflux"; 
-      return feeds;
+      return this.state.feeds;
     })
     .then(feeds => {
       this.setState(state => {
-        const categories = state.categories;
-        Object.values(categories).forEach(c => {
-          categories[c.id]['unreads'] = Object.values(feeds)
+        const feeds = state.feeds;
+        feeds
+        .filter(f => f.fetch_url === undefined)
+        .filter((f,index,self) => self.indexOf(f) === index)
+        .forEach(c => {
+          feeds[feeds.indexOf(c)]['unreads'] = feeds
+            .filter(x => x.category)
             .filter(x => x.category.id === c.id)
             .reduce((a, b) => {return a + (b['unreads'] || 0)}, 0)
         });
-        return {categories: categories}
+        return {feeds: feeds}
       })
     },
+    
     e => {})
   }
 
-  updateIcon(f) {
+  updateUnreadById(f) {
+    this.state.feeds
+    .filter(x => x.id < 0 || x.id === f)
+    .forEach(x => this.updateUnread(x));
+  }
 
+  updateIcon(f) {
     const defaulticon = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE4LjEuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgODAgODAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDgwIDgwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8ZyBpZD0iX3gzN183X0Vzc2VudGlhbF9JY29uc18xOV8iPg0KCTxwYXRoIGlkPSJEb2N1bWVudCIgZD0iTTY5LjIsMjIuNEw0Ny40LDAuNkM0NywwLjIsNDYuNSwwLDQ2LDBIMTRjLTIuMiwwLTQsMS44LTQsNHY3MmMwLDIuMiwxLjgsNCw0LDRoNTJjMi4yLDAsNC0xLjgsNC00VjIzLjcNCgkJQzY5LjksMjMuMSw2OS42LDIyLjgsNjkuMiwyMi40eiBNNDgsNi44TDYzLjIsMjJINDhWNi44eiBNNjYsNzZIMTRWNGgzMHYyMGMwLDEuMSwwLjksMiwyLDJoMjBWNzZ6Ii8+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==';
 
     function setIcon(c, icon) {
       c.setState(state => {
         const feeds = state.feeds;
-        feeds[f.id]['icon_data'] = icon;
+        feeds[feeds.indexOf(f)]['icon_data'] = icon;
         return {feeds: feeds}
       })
     }
@@ -149,12 +181,8 @@ class App extends React.Component {
   }
 
   changeFeed(f) {
-    this.setState({currentFeed: f, currentCategory: null, currentItem: null});
+    this.setState({currentFeed: f, currentItem: null});
     this.updateUnread(f);
-  }
-
-  changeCategory(c) {
-    this.setState({currentFeed: null, currentCategory: c, currentItem: null});
   }
 
   changeItem(i) {
@@ -197,7 +225,6 @@ class App extends React.Component {
     }
 
     const currentFeed = this.state.currentFeed;
-    const currentCategory = this.state.currentCategory;
     const currentItem = this.state.currentItem;
     const errorStatus = this.state.error ? 
       <div className="error">
@@ -222,12 +249,9 @@ class App extends React.Component {
         <button className="refresh" onClick={this.refresh} title='Refresh feeds and counts'>&#8635;</button>
         <FeedBrowser 
           currentFeed={currentFeed}
-          currentCategory={currentCategory}
-          feeds={this.state.feeds} categories={this.state.categories}
+          feeds={this.state.feeds}
           onFeedChange={this.changeFeed}
-          onCategoryChange={this.changeCategory}
           errorHandler={this.errorHandler} />
-        
         </div>
         <SplitPane split="horizontal" minSize="10%"
               defaultSize={parseInt(localStorage.getItem('h_split')) || "40%"}
@@ -235,11 +259,10 @@ class App extends React.Component {
           <ItemBrowser
             ref={this.itembrowserref}
             currentFeed={currentFeed}
-            currentCategory={currentCategory}
             currentItem={currentItem} 
             feeds={this.state.feeds}
             onItemChange={this.changeItem}
-            updateUnread={this.updateUnread}
+            updateUnread={this.updateUnreadById}
             errorHandler={this.errorHandler} />
           <ItemViewer
             currentItem={currentItem}
