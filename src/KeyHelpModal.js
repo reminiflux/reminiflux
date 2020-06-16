@@ -37,7 +37,9 @@ class KeyHelpModal extends React.Component {
 				  <tr><td>Left/p/k</td><td>Open previous item</td></tr>
 				  <tr><td>Right/n/j/Space</td><td>Open next item</td></tr>
 				  <tr><td>Home</td><td>Open first item</td></tr>
-				  <tr><td>End</td><td>Open first item</td></tr>
+				  <tr><td>End</td><td>Open last item</td></tr>
+				  <tr><td>PageUp</td><td>Scroll item content up</td></tr>
+				  <tr><td>PageDown</td><td>Scroll item content down</td></tr>
 				  <tr><td>m</td><td>Mark item as read/unread</td></tr>
 				  <tr><td>A</td><td>Mark all items as read</td></tr>
 				  <tr><td>u</td><td>Toggle showing unread/all items</td></tr>

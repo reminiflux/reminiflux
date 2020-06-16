@@ -14,6 +14,8 @@ class ItemViewer extends React.Component {
 	  this.topRef = React.createRef();
 	}
 	onKeyDown(keyName, e, handle) {
+		// Workaround: Pane component cannot be referenced otherwise by refs or ids
+		const div = document.getElementsByClassName('Pane horizontal Pane2')[1];
 		switch(keyName) {
 			case "f":
 				this.handleStar();
@@ -23,6 +25,14 @@ class ItemViewer extends React.Component {
 				break;
 			case "c":
 				window.open(this.state.item.comments_url || this.state.item.url, '_blank')
+				break;
+			case 'pagedown':
+				div.scrollTop += div.clientHeight;
+				e.preventDefault();
+				break;
+			case 'pageup':
+				div.scrollTop -= div.clientHeight;
+				e.preventDefault();
 				break;
 			default: 
 		}
@@ -34,7 +44,9 @@ class ItemViewer extends React.Component {
 	  if (prevProps.currentItem !== this.props.currentItem) {
 		this.fetch();
 	  }
-	  if (this.topRef.current) { this.topRef.current.scrollIntoView(); }
+	  if (this.topRef.current) { 
+		this.topRef.current.scrollIntoView();
+	  }
 	}
 	fetch() {
 	  if (!this.props.currentItem) {
@@ -58,7 +70,8 @@ class ItemViewer extends React.Component {
 	  const content = {__html: item.content };
 	  return (
 		<Hotkeys 
-		 keyName="f,v,c" 
+		 keyName="f,v,c,pagedown,pageup"
+		 allowRepeat="true" 
 		 onKeyDown={this.onKeyDown.bind(this)}>
 		  <div ref={this.topRef}>
 		    <div className="itemheader">
@@ -68,7 +81,7 @@ class ItemViewer extends React.Component {
 						<td className="title">
 							<a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a>
 							&nbsp;
-							<a href={item.comments_url ? item.comments_url : item.url} title="Comments" style={{'textDecoration': 'none'}} target="_blank"  rel="noopener noreferrer">
+							<a href={item.comments_url || item.url} title="Comments" style={{'textDecoration': 'none'}} target="_blank"  rel="noopener noreferrer">
 								<span role="img" aria-label="comments">&#128172;</span>
 							</a>
 						</td>

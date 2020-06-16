@@ -28,7 +28,9 @@ class ItemBrowser extends React.Component {
 	  this.currentRef       = React.createRef();
 	}
 	scrollToCurrent() {
-		if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'}); }
+		if (this.currentRef.current) { 
+			this.currentRef.current.scrollIntoView({block: 'center'}); 
+		}
 	}
 	onKeyDown(keyName, e, handle) {
 		switch(keyName) {
@@ -238,7 +240,7 @@ class ItemBrowser extends React.Component {
         
 		<div className="itemlistcontrol">
 
-			{ this.feedlink(this.props.currentFeed || this.props.currentCategory, items) }
+			{ this.feedlink(this.props.currentFeed, items) }
 			
 			<div className="itemlistcontrolbuttons">
 			  <button onClick={this.markAllRead} title="Mark all as read"> &#10003; </button>
