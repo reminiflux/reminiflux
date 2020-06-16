@@ -67,8 +67,8 @@ class App extends React.Component {
         })
         
         const feedTree = 
-        [ { 'id': -1, 'title' : 'All', 'fetch_url' : '/entries', 'unreads' : 0 },
-          { 'id': -2, 'title' : 'Starred', 'fetch_url' : '/entries?starred=true', 'unreads' : 0 } ]
+        [ { 'id': -1, 'title' : 'All', 'fetch_url' : 'entries', 'unreads' : 0 },
+          { 'id': -2, 'title' : 'Starred', 'fetch_url' : 'entries?starred=true', 'unreads' : 0 } ]
         
         categories
         .sort((a,b) => a.title.localeCompare(b.title))
