@@ -1,30 +1,76 @@
 import React from 'react';
 import Modal from 'react-modal';
-import './Modals.css';
+import styled from 'styled-components';
 
-class KeyHelpModal extends React.Component {
-	constructor(props) {
-	  super(props);
-      this.state = {
-		  isOpen: false
-	  }
-	  this.closeHelp = this.closeHelp.bind(this);
-	}
-	
-	componentDidMount() {
-		this.setState({isOpen: true});
-	}
+const keyMap = [
+	['Up', 'Open previous feed'],
+	['Down', 'Open next feed'],
+	['U', 'Toggle showing unread/all feeds'],
+	['Left/p/k', 'Open previous item'],
+	['Right/n/j/Space', 'Open next item'],
+	['Home', 'Open first item'],
+	['End', 'Open last item'],
+	['PageUp', 'Scroll item content up'],
+	['PageDown', 'Scroll item content down'],
+	['m', 'Mark item as read/unread'],
+	['A', 'Mark all items as read'],
+	['u', 'Toggle showing unread/all items'],
+	['s', 'Toggle item sort order (newest/oldest first)'],
+	['f', 'Star/unstar item'],
+	['v', 'Open original link in new tab'],
+	['c', 'Open comments link in new tab'],
+	['h', 'Show keyboard shortcuts'],
+	['Escape/Enter', 'Close modal window']
+]
 
-	closeHelp() {
-	  this.setState({isOpen: false});
-	  this.props.onClose();
-	}
-  
-	render() {
-		return (
-		  <Modal isOpen={this.state.isOpen} ariaHideApp={false} className="modal" overlayClassName="overlay">
-		  <h3>Keyboard shortcuts</h3>
-		  <table className="keyhelp">
+const ReactModalAdapter = ({ className, modalClassName, ...props }) => {
+	return (
+	  <Modal
+		className={modalClassName}
+		portalClassName={className}
+		{...props} />
+	)
+}
+
+const StyledModal = styled(ReactModalAdapter).attrs({
+	overlayClassName: 'Overlay',
+	modalClassName: 'Modal'
+  })`
+	.Modal {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		right: auto;
+		bottom: auto;
+		background-color: white;
+		padding: 10px;
+		margin-right: -50%;
+		transform: translate(-50%, -50%);
+		}
+	.Overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: darkgray;
+	}	
+	`;
+
+const ModalHead = styled.h3`
+	text-align: center;
+	`;
+
+const KeyTable = styled.table`
+	text-align: center;
+	padding: 5px;
+	`;
+
+function KeyHelpModal(props) {
+	return (
+		<StyledModal isOpen={true} ariaHideApp={false}>
+			<ModalHead>Keyboard shortcuts</ModalHead>
+			<KeyTable>
 			  <thead>
 				  <tr>
 					  <th>Key</th>
@@ -32,30 +78,12 @@ class KeyHelpModal extends React.Component {
 				  </tr>
 			  </thead>
 			  <tbody>
-				  <tr><td>Up</td><td>Open previous feed</td></tr>
-				  <tr><td>Down</td><td>Open next feed</td></tr>
-				  <tr><td>Left/p/k</td><td>Open previous item</td></tr>
-				  <tr><td>Right/n/j/Space</td><td>Open next item</td></tr>
-				  <tr><td>Home</td><td>Open first item</td></tr>
-				  <tr><td>End</td><td>Open last item</td></tr>
-				  <tr><td>PageUp</td><td>Scroll item content up</td></tr>
-				  <tr><td>PageDown</td><td>Scroll item content down</td></tr>
-				  <tr><td>m</td><td>Mark item as read/unread</td></tr>
-				  <tr><td>A</td><td>Mark all items as read</td></tr>
-				  <tr><td>u</td><td>Toggle showing unread/all items</td></tr>
-				  <tr><td>s</td><td>Toggle item sort order (newest/oldest first)</td></tr>
-				  <tr><td>f</td><td>Star/unstar item</td></tr>
-				  <tr><td>v</td><td>Open original link in new tab</td></tr>
-				  <tr><td>c</td><td>Open comments link in new tab</td></tr>
-				  <tr><td>h</td><td>Show keyboard shortcuts</td></tr>
-				  <tr><td>Escape/Enter</td><td>Close modal window</td></tr>
+			  	{ keyMap.map(r => <tr> { r.map(c => <td> {c} </td>) } </tr>) }
 			  </tbody>
-		  </table>
-		  <p/>
-		  <button onClick={this.closeHelp}>OK</button>
-		</Modal>
-		);
-	  }
-	}
+		  	</KeyTable>
+		  	<button onClick={props.onClose}>OK</button>
+		</StyledModal>
+	)
+}
 
 export default KeyHelpModal;
