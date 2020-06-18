@@ -1,104 +1,99 @@
-import React from 'react';
-import './FeedBrowser.css';
-import Hotkeys from 'react-hot-keys';
+import React, {useState, useEffect, useRef} from 'react';
+import styled from 'styled-components';
+import { useHotkeys } from 'react-hotkeys-hook';
 
-class FeedBrowser extends React.Component {
-	constructor(props) {
-	  super(props);
+const FeedList = styled.div`
+	padding: 5px
+	`;
 
-	  this.unreadbubble = this.unreadbubble.bind(this);
-	  this.prevFeed     = this.prevFeed.bind(this);
-	  this.nextFeed     = this.nextFeed.bind(this);
-	  this.currentRef   = React.createRef();
+const UnreadBubble = styled.div`
+	margin-left: 10px;
+	border-radius: 4px;
+	font-weight: bold;
+	text-align: center;
+	font-size: 10px;
+	color: white;
+	min-width: 20px;
+	display: inline-block;
+	padding: 1px;
+	`;
+
+const FeedRow = styled.div`
+	margin-left: ${props => (props.isFeed ? '20px' : '0px')};
+	font-weight: ${props => (props.isFeed ? 'inherit' : 'bold')};
+	background-color: ${props => (props.selected ? 'lightslategrey' : 'inherit') };
+	color: ${props => (props.error ? 'red' : (props.unread ? 'black' : 'lightgray'))};
+	padding: 2px;
+	&:hover {
+		background-color: grey;
+		cursor: pointer
 	}
-	scrollToCurrent() {
-		if (this.currentRef.current) { this.currentRef.current.scrollIntoView({block: 'center'}); }
+	${UnreadBubble}{
+		background-color: ${props => (props.isFeed ? '#2a89bc' : '#454545' )};
 	}
-	onKeyDown(keyName, e, handle) {
-		switch(keyName) {
-			case "up":
-				this.prevFeed();
-				this.scrollToCurrent();
-				e.preventDefault();
-				break
-			case "down":
-				this.nextFeed();
-				this.scrollToCurrent();
-				e.preventDefault();
-				break
-			default: 
+	`;
+
+const Favico = styled.img`
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+	margin-right: 5px;
+	`;
+
+function FeedBrowser(props) {
+
+	const [showAll, setShowAll] = useState(true);
+	const [feeds, setFeeds] = useState([]);
+	const selectedFeed = useRef();
+
+	const afterChange = (e) => {
+		if (selectedFeed.current) { 
+			selectedFeed.current.scrollIntoView({block: 'center'});
 		}
+		e.preventDefault();
 	}
 
-	prevFeed() {
-		this.props.onFeedChange(this.props.feeds[
-			this.props.feeds.indexOf(this.props.currentFeed) - 1 >= 0 ?
-			this.props.feeds.indexOf(this.props.currentFeed) - 1 :
+	useHotkeys('up', (e) => {
+		props.onFeedChange(feeds[
+			feeds.indexOf(props.currentFeed) - 1 >= 0 ?
+			feeds.indexOf(props.currentFeed) - 1 :
 			0]);
-	}
+		afterChange(e);
+		}, [props, feeds]);
 
-	nextFeed() {
-		this.props.onFeedChange(this.props.feeds[
-			this.props.feeds.indexOf(this.props.currentFeed) + 1 < this.props.feeds.length ?
-			this.props.feeds.indexOf(this.props.currentFeed) + 1 :
-			this.props.feeds.length - 1]);
-	}
+	useHotkeys('down', (e) => {
+		props.onFeedChange(feeds[
+			feeds.indexOf(props.currentFeed) + 1 < feeds.length ?
+			feeds.indexOf(props.currentFeed) + 1 :
+			feeds.length - 1]);
+		afterChange(e);
+		}, [props, feeds]);
 
-	unreadbubble(i) {
-	  if (!i.unreads) { return }
-	  return <span className="unreadcount">{i.unreads}</span>;
-	}
-  
-	render() {
+	useHotkeys('shift+u', () => setShowAll(showAll => !showAll));
 
-	  return (
-		<Hotkeys 
-        keyName="up,down" 
-        onKeyDown={this.onKeyDown.bind(this)}>
-		<div className="feedlist">
-
-			{this.props.feeds
-			.map(item => {
-				if (!item.category) {
-					return (
-					  <div key={"c" + item.id}>
-						<div className={`categoryrow
-						  ${item === this.props.currentFeed ? "selected" : ""}
-						  `}
-						ref={item === this.props.currentFeed ? this.currentRef : undefined}
-						onClick={() => this.props.onFeedChange(item)}>
-					 		<div className="category">
-					   			{item.title}
-					   			{this.unreadbubble(item)}
-					 		</div>
-				   		</div>	   
-					  </div>
-					)
-				} else {
-					return (
-					  <div key={item.id}>
-						<div className={`feedrow
-						  ${item === this.props.currentFeed ? "selected" : ""}
-						  `} 
-						ref={item === this.props.currentFeed ? this.currentRef : undefined}
-						onClick={() => this.props.onFeedChange(item)}>
-					 		<img className="favico" src={item.icon_data} alt="" />
-					 		<div className={`feed 
-								 ${item.parsing_error_count > 0 ? "errorfeed" : ""}
-						  		`}
-						  		title={item.parsing_error_message} >
-					   			{item.title}
-					   			{this.unreadbubble(item)}
-					 		</div>
-						</div>
-					  </div>   
-	   				)
-				}
-			})}
-		</div>
-		</Hotkeys>
-	);
-	}
+	useEffect(() => setFeeds(props.feeds.filter(f => showAll || f.unreads > 0)), [props.feeds, showAll]);
+	
+	return (
+		<FeedList>
+			<button onClick={() => setShowAll(!showAll)}>Unread/All</button>
+			{ feeds
+			  .map(item => (
+				<FeedRow
+				  key = { item.fetch_url || item.id }
+				  ref = { item === props.currentFeed ? selectedFeed : null }
+				  isFeed = { item.is_feed }
+				  selected = { item === props.currentFeed }
+				  unread = { item.unreads }
+				  error = { item.parsing_error_count }
+				  title = { item.parsing_error_message }
+				  onClick= { () => props.onFeedChange(item) }>
+					{ item.is_feed && <Favico src={item.icon_data} /> }
+					{ item.title }
+					{ item.unreads > 0 && <UnreadBubble> {item.unreads} </UnreadBubble> }
+				</FeedRow>
+			))}
+		</FeedList>
+	)
 }
 
 export default FeedBrowser;

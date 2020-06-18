@@ -77,7 +77,7 @@ class App extends React.Component {
             feedTree.push(...f
             .filter(f => f.category.id === c.id)
             .sort((a,b) => a.title.localeCompare(b.title))
-            .map(f => Object.assign(f, { 'fetch_url' : 'feeds/' + f.id + '/entries' })))
+            .map(f => Object.assign(f, { 'fetch_url' : 'feeds/' + f.id + '/entries', 'is_feed' : true })))
           });
         this.setState({ feeds: feedTree });
         localStorage.setItem('feeds', JSON.stringify(feedTree));
