@@ -5,8 +5,7 @@ import {apiCall} from './lib/util';
 import FeedBrowser from './FeedBrowser';
 import ItemBrowser from './ItemBrowser';
 import ItemViewer from './ItemViewer';
-import SettingsModal from './SettingsModal';
-import KeyHelpModal from './KeyHelpModal';
+import {KeyHelpModal, SettingsModal} from './Modals';
 import Hotkeys from 'react-hot-keys';
 
 class App extends React.Component {
@@ -40,12 +39,6 @@ class App extends React.Component {
 		switch(keyName) {
       case "h":
         this.openKeyHelp();
-        break;
-      case "enter":
-      case "esc":
-        if (this.state.keyHelpIsOpen) {
-          this.closeKeyHelp();
-        }
         break;
 			default: 
 		}
@@ -221,7 +214,7 @@ class App extends React.Component {
     }
 
     if (this.state.keyHelpIsOpen) {
-      return <Hotkeys keyName="enter,esc" onKeyDown={this.onKeyDown.bind(this)}><KeyHelpModal onClose={this.closeKeyHelp} /></Hotkeys>;
+      return <KeyHelpModal onClose={this.closeKeyHelp} />;
     }
 
     const currentFeed = this.state.currentFeed;
@@ -237,7 +230,7 @@ class App extends React.Component {
 
     return (
       <Hotkeys 
-      keyName="h,enter,esc" 
+      keyName="h" 
       onKeyDown={this.onKeyDown.bind(this)}>
       <div>
       {errorStatus}
