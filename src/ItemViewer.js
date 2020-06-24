@@ -30,7 +30,7 @@ const StarButton = styled.div`
 
 function ItemViewer(props) {
 	const [item, setItem] = useState();
-	const [starToggle, setStarToggle] = useState(false);
+	const [starChange, setStarChange] = useState(false);
 	const topRef = useRef();
 
 	useHotkeys('f', () => toggleStar(), [item]);
@@ -48,19 +48,18 @@ function ItemViewer(props) {
 	});
 
 	useEffect(() => {
-		const fetchItem = async () => {
-			if (props.currentItem) {
-				const result = await apiCall('entries/' + props.currentItem, props.errorHandler);
-				setItem(result);
-				topRef.current.scrollIntoView();
-			}
-		};
-		fetchItem();
-	}, [props.currentItem, props.errorHandler, starToggle]);
+		setItem(props.currentItem);
+		if (topRef.current) topRef.current.scrollIntoView();
+	}, [props.currentItem]);
 
 	const toggleStar = async () => {
-		await apiCall('entries/' + item.id + '/bookmark', props.errorHandler, {});
-		setStarToggle(!starToggle);
+		if (item) { 
+			await apiCall('entries/' + item.id + '/bookmark', props.errorHandler, {});
+			const i = item;
+			item.starred = !item.starred;
+			setItem(i);
+			setStarChange(s => s + 1);
+		}
 	};
 
 	return !item ? null : (

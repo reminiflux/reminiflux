@@ -65,7 +65,7 @@ function FeedItemList(props) {
 
 	const itemChange = (item) => {
 		if (item) {
-			props.onItemChange(item.id); 
+			props.onItemChange(item); 
 			if (item.status === 'unread') props.markRead([item]);
 		} 
 	}
@@ -101,9 +101,9 @@ function FeedItemList(props) {
 			{props.items.map(item => 
 			<FeedItem 
 			  key = {item.id}
-			  ref = {props.currentItem === item.id ? selectedItem : null}
+			  ref = {props.currentItem === item ? selectedItem : null}
 			  item = {item}
-			  selected = {props.currentItem === item.id}
+			  selected = {props.currentItem === item}
 			  feed = {props.feeds.find(f => f.id === item.feed.id && f.category)}
 			  onItemChange = {() => itemChange(item)}
 			  markRead = {() => props.markRead([item], item.status === 'unread')}
@@ -240,7 +240,7 @@ function ItemBrowser(props) {
 		  <FeedItemHeader
 		    items = {items}
 			currentFeed = {props.currentFeed}
-			currentIndex = {props.currentItem ? items.findIndex(x => x.id === props.currentItem) : -1}
+			currentIndex = {props.currentItem ? items.indexOf(props.currentItem) : -1}
 			sortOldFirst = {sortOldFirst} 
 			setSortOldFirst = {(b) => { setSortOldFirst(b); localStorage.setItem('sort', b ? 'o' : 'n');}}
 			showRead = {showRead}
@@ -252,7 +252,7 @@ function ItemBrowser(props) {
 		    items = {items}
 		    feeds = {props.feeds}
 			currentItem = {props.currentItem}
-			currentIndex = {props.currentItem ? items.findIndex(x => x.id === props.currentItem) : -1}
+			currentIndex = {props.currentItem ? items.indexOf(props.currentItem) : -1}
 		    onItemChange = {props.onItemChange}
 		    markRead = {markRead}
 		    errorHandler = {props.errorHandler} />
