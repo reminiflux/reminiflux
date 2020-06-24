@@ -1,3 +1,4 @@
+import React from 'react';
 import moment from 'moment';
 
 export function apiCall(s, errorHandler, body = null) {
@@ -56,4 +57,13 @@ export function relaTimestamp(t) {
 export function formatDate(t) {
 	return moment(t).format('D MMM HH:mm');
 
+}
+
+export function linkNewTab(title, link, stripStyle) {
+	return (<a href={link} 
+		target="_blank"
+		rel="noopener noreferrer"
+		style={ stripStyle && {'textDecoration': 'none'} }>
+			{title}
+			</a>)
 }

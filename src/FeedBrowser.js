@@ -43,6 +43,7 @@ const Favico = styled.img`
 function FeedBrowser(props) {
 
 	const [showAll, setShowAll] = useState(true);
+	const toggleShowAll = () => setShowAll(!showAll);
 	const [feeds, setFeeds] = useState([]);
 	const selectedFeed = useRef();
 
@@ -69,13 +70,13 @@ function FeedBrowser(props) {
 		afterChange(e);
 		}, [props, feeds]);
 
-	useHotkeys('shift+u', () => setShowAll(showAll => !showAll));
+	useHotkeys('shift+u', () => toggleShowAll(), [showAll]);
 
 	useEffect(() => setFeeds(props.feeds.filter(f => showAll || f.unreads > 0)), [props.feeds, showAll]);
 	
 	return (
 		<FeedList>
-			<button onClick={() => setShowAll(!showAll)}>Unread/All</button>
+			<button onClick={toggleShowAll}>Unread/All</button>
 			{ feeds
 			  .map(item => (
 				<FeedRow

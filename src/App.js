@@ -250,7 +250,6 @@ class App extends React.Component {
               defaultSize={parseInt(localStorage.getItem('h_split')) || "40%"}
               onChange={size => localStorage.setItem('h_split', size)}>
           <ItemBrowser
-            ref={this.itembrowserref}
             currentFeed={currentFeed}
             currentItem={currentItem} 
             feeds={this.state.feeds}

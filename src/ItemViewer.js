@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { apiCall, formatDate } from './lib/util';
+import { apiCall, formatDate, linkNewTab } from './lib/util';
 import styled from 'styled-components';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -27,15 +27,6 @@ const StarButton = styled.div`
 		cursor: pointer
 	}
 	`;
-
-function linkNewTab(title, link, stripStyle) {
-	return (<a href={link} 
-		target="_blank"
-		rel="noopener noreferrer"
-		style={ stripStyle && {'textDecoration': 'none'} }>
-			{title}
-			</a>)
-}
 
 function ItemViewer(props) {
 	const [item, setItem] = useState();
