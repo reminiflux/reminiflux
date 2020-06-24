@@ -30,7 +30,6 @@ const StarButton = styled.div`
 
 function ItemViewer(props) {
 	const [item, setItem] = useState();
-	const [starChange, setStarChange] = useState(false);
 	const topRef = useRef();
 
 	useHotkeys('f', () => toggleStar(), [item]);
@@ -55,10 +54,11 @@ function ItemViewer(props) {
 	const toggleStar = async () => {
 		if (item) { 
 			await apiCall('entries/' + item.id + '/bookmark', props.errorHandler, {});
-			const i = item;
+			// update in item, which is a reference to an element in props.items, so that the change
+			// persists in the overall item list as long as it is not refetched
 			item.starred = !item.starred;
-			setItem(i);
-			setStarChange(s => s + 1);
+			// update also item to trigger rerender
+			setItem({...item, starred: item.starred});
 		}
 	};
 

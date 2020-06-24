@@ -63,7 +63,7 @@ export function linkNewTab(title, link, stripStyle) {
 	return (<a href={link} 
 		target="_blank"
 		rel="noopener noreferrer"
-		style={ stripStyle && {'textDecoration': 'none'} }>
+		style={ stripStyle && {'textDecoration': 'none', 'color' : 'inherit'} }>
 			{title}
 			</a>)
 }

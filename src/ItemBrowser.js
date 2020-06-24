@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import {apiCall, relaTimestamp, linkNewTab} from './lib/util';
 import SplitPane from 'react-split-pane';
 import styled from 'styled-components';
-import { useHotkeys } from 'react-hotkeys-hook';
+import {useHotkeys} from 'react-hotkeys-hook';
 
 const Favico = styled.img`
 	width: 16px;
@@ -42,6 +42,19 @@ const ItemListCell = styled.td`
 	text-align: ${props => props.align || 'left'}
 	`;
 
+const ContentPreview = styled.span`
+	font-size: 80%;
+	color: #bbb;
+	margin-left: 10px
+	`;
+
+const extractContent = (s) => {
+	var span= document.createElement('span');
+	span.innerHTML= s;
+    span.querySelectorAll('*').forEach(c => c.textContent ? c.textContent += ' ' : c.innerText += ' ');
+	return [span.textContent || span.innerText].toString().replace(/ +/g,' ');
+};
+
 const FeedItem = React.forwardRef((props, ref) => (
 		<ItemListRow read={props.item.status !== 'unread'} ref={ref} selected={props.selected}>
 			<ItemListCell width='20px'>
@@ -52,6 +65,7 @@ const FeedItem = React.forwardRef((props, ref) => (
 			</ItemListCell>
 			<ItemListCell onClick={props.onItemChange}>
 				{props.item.title}
+				<ContentPreview>{extractContent(props.item.content)}</ContentPreview>
 			</ItemListCell>
 			<ItemListCell width='40px' align='right' onClick={props.onItemChange} title={props.item.published_at}>
 				{relaTimestamp(props.item.published_at)}
@@ -117,16 +131,20 @@ const Header = styled.div`
 	padding: 2px;
 	width: 100%;
 	background: #ddd;
-	border-bottom: 1px solid lightgray`;
+	border-bottom: 1px solid lightgray
+	`;
 const HeaderText = styled.div`
 	display: inline-block;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%); 
 	`;
 const HeaderTitle = styled.span`
 	font-weight: bold;
-	font-size: 110%;
+	font-size: 120%;
 	`;
 const HeaderCount = styled.span`
-	font-size: 90%
+	font-size: 90%;
 	`;
 const HeaderControls = styled.div`
 	float: right
@@ -163,7 +181,7 @@ function FeedItemHeader(props) {
 						  linkNewTab(<span>&#8599;</span>, props.currentFeed.site_url, true) }
 					</HeaderTitle>
 					&nbsp;
-			   	  	<HeaderCount>({props.items.length})</HeaderCount>
+			   	  	<HeaderCount>({props.items.length} items)</HeaderCount>
 				</HeaderText>
 			)}	
 		
@@ -190,12 +208,14 @@ function FeedItemHeader(props) {
 }
 function ItemBrowser(props) {
 	const [items, setItems] = useState([]);
+	const [isLoading, setIsLoading] = useState(false);
 	const [sortOldFirst, setSortOldFirst] = useState(localStorage.getItem('sort') === 'o')
 	const [showRead, setShowRead] = useState(localStorage.getItem('filter') === 'a')
 	
 	useEffect(() => {
 		const fetchItems = async () => {
 			if (props.currentFeed) {
+				setIsLoading(true);
 				const urls = props.currentFeed.fetch_url ?
 							[props.currentFeed.fetch_url] :
 							props.feeds
@@ -213,6 +233,7 @@ function ItemBrowser(props) {
 				setItems(items.sort((a,b) => sortOldFirst ?
 					a.published_at.localeCompare(b.published_at) :
 					b.published_at.localeCompare(a.published_at)));
+				setIsLoading(false);
 			}
 		};
 		fetchItems();
@@ -234,31 +255,32 @@ function ItemBrowser(props) {
 			setItems(currItems);
 		}
 	}
-	return (
+	return 	(
 		<SplitPane split="horizontal" minSize="26px" defaultSize="26px" allowResize={false} >
 
-		  <FeedItemHeader
-		    items = {items}
-			currentFeed = {props.currentFeed}
-			currentIndex = {props.currentItem ? items.indexOf(props.currentItem) : -1}
-			sortOldFirst = {sortOldFirst} 
-			setSortOldFirst = {(b) => { setSortOldFirst(b); localStorage.setItem('sort', b ? 'o' : 'n');}}
-			showRead = {showRead}
-			setShowRead = {(b) => { setShowRead(b); localStorage.setItem('filter', b ? 'a' : 'u');}}
-		    markRead = {markRead}
-		    errorHandler = {props.errorHandler} />		  
+			<FeedItemHeader
+		   		items = {items}
+				currentFeed = {props.currentFeed}
+				currentIndex = {props.currentItem ? items.indexOf(props.currentItem) : -1}
+				sortOldFirst = {sortOldFirst} 
+				setSortOldFirst = {(b) => { setSortOldFirst(b); localStorage.setItem('sort', b ? 'o' : 'n');}}
+				showRead = {showRead}
+				setShowRead = {(b) => { setShowRead(b); localStorage.setItem('filter', b ? 'a' : 'u');}}
+		   		markRead = {markRead}
+		   		errorHandler = {props.errorHandler} />		  
 
-		  <FeedItemList 
-		    items = {items}
-		    feeds = {props.feeds}
-			currentItem = {props.currentItem}
-			currentIndex = {props.currentItem ? items.indexOf(props.currentItem) : -1}
-		    onItemChange = {props.onItemChange}
-		    markRead = {markRead}
-		    errorHandler = {props.errorHandler} />
-
-		</SplitPane>		
-	)
+			{ isLoading ? '...' :
+				<FeedItemList 
+		    		items = {items}
+		    		feeds = {props.feeds}
+					currentItem = {props.currentItem}
+					currentIndex = {props.currentItem ? items.indexOf(props.currentItem) : -1}
+		    		onItemChange = {props.onItemChange}
+		    		markRead = {markRead}
+		    		errorHandler = {props.errorHandler} />
+			}
+			</SplitPane>		
+		)
 }
 
 export default ItemBrowser;
