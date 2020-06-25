@@ -1,5 +1,5 @@
 import React from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 
 export function apiCall(s, errorHandler, body = null) {
 	const server = localStorage.getItem('miniflux_server');
@@ -55,8 +55,7 @@ export function relaTimestamp(t) {
 }
 
 export function formatDate(t) {
-	return moment(t).format('D MMM HH:mm');
-
+	return dayjs(t).format('D MMM HH:mm');
 }
 
 export function linkNewTab(title, link, stripStyle) {

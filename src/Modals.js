@@ -1,7 +1,10 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-modal';
 import styled from 'styled-components';
 import { useHotkeys } from 'react-hotkeys-hook';
+import preval from 'preval.macro';
+import dayjs from 'dayjs';
+import { linkNewTab } from './lib/util';
 
 const keyMap = [
 	['Up', 'Open previous feed'],
@@ -58,11 +61,11 @@ const StyledModal = styled(ReactModalAdapter).attrs({
 	}	
 	`;
 
-const ModalHead = styled.h3`
+const ModalTitle = styled.h2`
 	text-align: center;
 	`;
 
-const KeyTable = styled.table`
+	const KeyTable = styled.table`
 	text-align: center;
 	padding: 5px;
 	`;
@@ -76,7 +79,7 @@ export function KeyHelpModal(props) {
 
 	return (
 		<StyledModal isOpen={true} ariaHideApp={false}>
-			<ModalHead>Keyboard shortcuts</ModalHead>
+			<ModalTitle>Keyboard shortcuts</ModalTitle>
 			<KeyTable>
 			  <thead>
 				  <tr>
@@ -117,7 +120,12 @@ export function SettingsModal(props) {
 
 	return (
 		<StyledModal isOpen={true} ariaHideApp={false}>
-			<ModalHead>Settings</ModalHead>
+			<ModalTitle>Reminiflux</ModalTitle>
+			<p>
+				{ linkNewTab('Homepage', 'https://github.com/reminiflux/reminiflux') }
+				<br/>
+				Build date: { dayjs(preval`module.exports = new Date()`).format('YYYY-MM-DD HH:mm:ss (Z)') }</p>
+			<h3>Settings</h3>
 			<p>
 			<b>Host</b> (without /v1, e.g. <i>https://miniflux.mydomain.tld</i>):
 			<br/>
