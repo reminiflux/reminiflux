@@ -244,9 +244,9 @@ function ItemBrowser(props) {
 			await apiCall('entries', props.errorHandler, 
 				{ 'entry_ids' : i.map(x => x.id), 
 			  	  'status'    : (read || read === undefined) ? 'read' : 'unread' });
-			i.map(x => x.feed.id)
-			.filter((f,index,self) => self.indexOf(f) === index)
-			.forEach(f => props.updateUnread(f));
+			props.updateUnread(i
+				.map(x => x.feed.id)
+				.filter((f,index,self) => self.indexOf(f) === index))
 			
 			const currItems = items;
 			i.forEach(item => 

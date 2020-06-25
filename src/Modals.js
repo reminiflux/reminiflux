@@ -111,6 +111,7 @@ export function SettingsModal(props) {
 		localStorage.setItem('miniflux_server', host);
 	    localStorage.setItem('miniflux_api_key', apikey);
 		localStorage.setItem('fetch_limit', parseInt(limit) || 100);
+		props.onSubmit();
 		props.onClose();
 	}
 

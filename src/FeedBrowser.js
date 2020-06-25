@@ -22,7 +22,7 @@ const FeedRow = styled.div`
 	margin-left: ${props => (props.isFeed ? '20px' : '0px')};
 	font-weight: ${props => (props.isFeed ? 'inherit' : 'bold')};
 	background-color: ${props => (props.selected ? 'lightslategrey' : 'inherit') };
-	color: ${props => (props.error ? 'red' : (props.unread ? 'black' : 'lightgray'))};
+	color: ${props => (props.error ? 'red' : (props.unread ? 'black' : '#bbb'))};
 	padding: 2px;
 	&:hover {
 		background-color: grey;
@@ -40,10 +40,19 @@ const Favico = styled.img`
 	margin-right: 5px;
 	`;
 
+const FloatingButton = styled.button`
+	float: right;
+	margin-top: 0px;
+	margin-right: 5px;
+	font-size: 12px;
+	width: 30px;
+	height: 30px
+	`;
+
 function FeedBrowser(props) {
 
-	const [showAll, setShowAll] = useState(true);
-	const toggleShowAll = () => setShowAll(!showAll);
+	const [hideRead, setHideRead] = useState(false);
+	const toggleHideRead = () => setHideRead(!hideRead);
 	const [feeds, setFeeds] = useState([]);
 	const selectedFeed = useRef();
 
@@ -70,13 +79,15 @@ function FeedBrowser(props) {
 		afterChange(e);
 		}, [props, feeds]);
 
-	useHotkeys('shift+u', () => toggleShowAll(), [showAll]);
+	useHotkeys('shift+u', () => toggleHideRead(), [hideRead]);
 
-	useEffect(() => setFeeds(props.feeds.filter(f => showAll || f.unreads > 0)), [props.feeds, showAll]);
+	useEffect(() => setFeeds(props.feeds.filter(f => !hideRead || f.unreads > 0)), [props.feeds, hideRead]);
 	
 	return (
 		<FeedList>
-			<button onClick={toggleShowAll}>Unread/All</button>
+			<FloatingButton onClick={toggleHideRead} title="Toggle showing all/unread feeds">
+				{hideRead ? '⚪' : '⚫' }
+			</FloatingButton>
 			{ feeds
 			  .map(item => (
 				<FeedRow
