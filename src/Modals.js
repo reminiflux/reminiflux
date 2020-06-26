@@ -46,7 +46,7 @@ const StyledModal = styled(ReactModalAdapter).attrs({
 		left: 50%;
 		right: auto;
 		bottom: auto;
-		background-color: white;
+		background-color: ${props => props.theme.body};
 		padding: 10px;
 		margin-right: -50%;
 		transform: translate(-50%, -50%);
@@ -57,7 +57,7 @@ const StyledModal = styled(ReactModalAdapter).attrs({
 		left: 0;
 		right: 0;
 		bottom: 0;
-		background-color: darkgray;
+		background-color: ${props => props.theme.modalbg};
 	}	
 	`;
 
@@ -114,6 +114,7 @@ export function SettingsModal(props) {
 		localStorage.setItem('miniflux_server', host);
 	    localStorage.setItem('miniflux_api_key', apikey);
 		localStorage.setItem('fetch_limit', parseInt(limit) || 100);
+		localStorage.setItem('theme', props.theme);
 		props.onSubmit();
 		props.onClose();
 	}
@@ -140,6 +141,14 @@ export function SettingsModal(props) {
 			<b>Maximum number of items to fetch</b>:
 			<br />
 			<ModalInput value={limit} onChange={(e) => setLimit(e.target.value)} />
+		  </p>
+		  <p>
+			  <b>Theme</b>:
+			  <br />
+			  <select value={props.theme} onChange={(e) => props.themeSetter(e.target.value)}>
+				  <option value='light'>light</option>
+				  <option value='dark'>dark</option>
+			  </select>
 		  </p>
 		  <p>
 			<b>Icon cache size</b>:

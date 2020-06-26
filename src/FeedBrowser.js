@@ -21,15 +21,15 @@ const UnreadBubble = styled.div`
 const FeedRow = styled.div`
 	margin-left: ${props => (props.isFeed ? '20px' : '0px')};
 	font-weight: ${props => (props.isFeed ? 'inherit' : 'bold')};
-	background-color: ${props => (props.selected ? 'lightslategrey' : 'inherit') };
-	color: ${props => (props.error ? 'red' : (props.unread ? 'black' : '#bbb'))};
+	background-color: ${props => (props.selected ? props.theme.selectbg : 'inherit') };
+	color: ${props => (props.error ? props.theme.errorentry : (props.unread ? 'inherit' : props.theme.readentry))};
 	padding: 2px;
 	&:hover {
-		background-color: grey;
+		background-color: ${props => props.theme.hoverbg};
 		cursor: pointer
 	}
 	${UnreadBubble}{
-		background-color: ${props => (props.isFeed ? '#2a89bc' : '#454545' )};
+		background-color: ${props => (props.isFeed ? props.theme.feedbubble : props.theme.categorybubble )};
 	}
 	`;
 
@@ -46,7 +46,7 @@ const FloatingButton = styled.button`
 	margin-right: 5px;
 	font-size: 12px;
 	width: 30px;
-	height: 30px
+	height: 30px;
 	`;
 
 function FeedBrowser(props) {
@@ -85,7 +85,7 @@ function FeedBrowser(props) {
 	
 	return (
 		<FeedList>
-			<FloatingButton onClick={toggleHideRead} title="Toggle showing all/unread feeds">
+			<FloatingButton onClick={(v) => { toggleHideRead(); v.target.blur(); }} title="Toggle showing all/unread feeds">
 				{hideRead ? '⚪' : '⚫' }
 			</FloatingButton>
 			{ feeds

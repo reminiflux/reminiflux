@@ -8,6 +8,9 @@ import styled from 'styled-components';
 import {useHotkeys} from 'react-hotkeys-hook';
 import {apiCall} from './lib/util';
 import {GlobalStyles} from "./globalStyles";
+import {ThemeProvider} from "styled-components";
+import {lightTheme, darkTheme} from "./themes"
+
 import './Reminiflux.css';
 
 const ErrorDiv = styled.div`
@@ -31,7 +34,7 @@ const FloatingButton = styled.button`
 	margin-right: 5px;
 	font-size: 16px;
 	width: 30px;
-	height: 30px
+	height: 30px;
 	`;
 
 const DEFAULT_ICON = 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE4LjEuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgODAgODAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDgwIDgwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8ZyBpZD0iX3gzN183X0Vzc2VudGlhbF9JY29uc18xOV8iPg0KCTxwYXRoIGlkPSJEb2N1bWVudCIgZD0iTTY5LjIsMjIuNEw0Ny40LDAuNkM0NywwLjIsNDYuNSwwLDQ2LDBIMTRjLTIuMiwwLTQsMS44LTQsNHY3MmMwLDIuMiwxLjgsNCw0LDRoNTJjMi4yLDAsNC0xLjgsNC00VjIzLjcNCgkJQzY5LjksMjMuMSw2OS42LDIyLjgsNjkuMiwyMi40eiBNNDgsNi44TDYzLjIsMjJINDhWNi44eiBNNjYsNzZIMTRWNGgzMHYyMGMwLDEuMSwwLjksMiwyLDJoMjBWNzZ6Ii8+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==';
@@ -41,6 +44,8 @@ const sum = (arr) => {
 }
 
 function Reminiflux() {
+	const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
+
 	const [error, setError] = useState();
 	const [currentFeed, setCurrentFeed] = useState();
 	const [currentItem, setCurrentItem] = useState();
@@ -134,12 +139,14 @@ function Reminiflux() {
 	useHotkeys('h', () => { setHelpOpen(true); })
 
 	return (
-		<div>
+		<ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
 			<GlobalStyles />
 			{ helpOpen ?
 			  <KeyHelpModal onClose={() => setHelpOpen(false)} /> :
 			  settingsOpen ?
 			  <SettingsModal
+				  theme={theme}
+				  themeSetter={setTheme}
 				  onClose={() => setSettingsOpen(false)}
 				  onSubmit={() => setUpdateFeedsTrigger(true)} /> :
 
@@ -194,7 +201,7 @@ function Reminiflux() {
 				</SplitPane>
 			  </div>
 			}
-		</div>
+		</ThemeProvider>
 	  );
 }
 

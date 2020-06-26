@@ -5,7 +5,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 
 const ItemHeader = styled.div`
 	padding: 2px;
-	background-color: lightgoldenrodyellow;
+	background-color: ${props => props.theme.itemheaderbg};
 	border-bottom: 1px solid lightgrey;
 	margin-left: 2px;
 	margin-right: 2px;

@@ -14,7 +14,7 @@ const StatusDot = styled.div`
 	height: 10px;
 	width: 10px;
 	border: 1px solid #bbb;
-	background-color: ${props => (props.read ? 'white' : '#555')};
+	background-color: ${props => (props.read ? props.theme.body : props.theme.unreaddot)};
 	border-radius: 50%;
 	display: inline-block;
 	`;
@@ -27,10 +27,10 @@ const ItemListTable = styled.table`
 	`;
 
 const ItemListRow = styled.tr`
-	color: ${props => (props.read ? '#999' : 'black')};
-	background-color: ${props => (props.selected ? 'lightgrey' : 'inherit')};
+	color: ${props => (props.read ? props.theme.readentry : 'inherit')};
+	background-color: ${props => (props.selected ? props.theme.selectbg : 'inherit')};
 	&:hover {
-		background-color: grey;
+		background-color: ${props => props.theme.hoverbg};
 		cursor: pointer
 	};
 `;
@@ -44,7 +44,7 @@ const ItemListCell = styled.td`
 
 const ContentPreview = styled.span`
 	font-size: 80%;
-	color: #bbb;
+	color: ${props => props.theme.preview};
 	margin-left: 10px
 	`;
 
@@ -130,7 +130,7 @@ function FeedItemList(props) {
 const Header = styled.div`
 	padding: 2px;
 	width: 100%;
-	background: #ddd;
+	background: ${props => props.theme.listheaderbg};
 	border-bottom: 1px solid lightgray
 	`;
 const HeaderText = styled.div`
@@ -152,7 +152,8 @@ const HeaderControls = styled.div`
 const ControlButton = styled.button`
 	height: 20px;
 	font-size: 90%;
-	width: 40px
+	width: 40px;
+	margin-right: 5px
 	`;
 
 function FeedItemHeader(props) {
