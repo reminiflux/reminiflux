@@ -167,9 +167,10 @@ function Reminiflux() {
 			  			<FloatingButton onClick={() => setSettingsOpen(true)} title='Settings'>
 							  &#9881;
 						</FloatingButton>
-			  			<FloatingButton onClick={async () => {
+			  			<FloatingButton onClick={async (v) => {
+							  v.target.blur();
 							  await apiCall('feeds/refresh', setError, {});
-							  setUpdateFeedsTrigger(true)
+							  setUpdateFeedsTrigger(true);
 						  }} title='Refresh feeds and counts'>
 							  &#8635;
 						</FloatingButton>

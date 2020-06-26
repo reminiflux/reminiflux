@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useReducer} from 'react';
 import styled from 'styled-components';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -49,9 +49,35 @@ const FloatingButton = styled.button`
 	height: 30px;
 	`;
 
+const Collapse = styled.div`
+	display: inline-block;
+	float: left;
+	margin-right: 2px;
+	&:hover {
+		cursor: pointer
+	}
+	`;
+
+const collapseReducer = (state, action) => {
+	let newstate;
+	switch (action.type) {
+		case 'collapse':
+			newstate = [...state, action.category];
+			break;
+		case 'expand':
+			newstate = state.filter(i => i !== action.category);
+			break;
+		default:
+			return state
+	}
+	localStorage.setItem('collapsed', JSON.stringify(newstate));
+	return newstate;
+}
+
 function FeedBrowser(props) {
 
 	const [hideRead, setHideRead] = useState(false);
+	const [collapsed, dispatch] = useReducer(collapseReducer, JSON.parse(localStorage.getItem('collapsed')) || []);
 	const toggleHideRead = () => setHideRead(!hideRead);
 	const [feeds, setFeeds] = useState([]);
 	const selectedFeed = useRef();
@@ -81,28 +107,46 @@ function FeedBrowser(props) {
 
 	useHotkeys('shift+u', () => toggleHideRead(), [hideRead]);
 
-	useEffect(() => setFeeds(props.feeds.filter(f => !hideRead || f.unreads > 0)), [props.feeds, hideRead]);
+	useHotkeys('x', () => {
+		if (!props.currentFeed) return;
+		const cat = props.currentFeed.is_feed ? props.currentFeed.category.id : props.currentFeed.id;
+		if (cat < 0) return;
+		dispatch({type: collapsed.includes(cat) ? 'expand' : 'collapse', category: cat });
+	}, [props.currentFeed, collapsed]);
+
+	useEffect(() => setFeeds(props.feeds
+		.filter(f =>
+			(!hideRead || f.unreads > 0) &&
+			(!f.is_feed || (f.is_feed && !collapsed.includes(f.category.id)))
+		)), [props.feeds, hideRead, collapsed]);
 	
 	return (
 		<FeedList>
-			<FloatingButton onClick={(v) => { toggleHideRead(); v.target.blur(); }} title="Toggle showing all/unread feeds">
+			<FloatingButton
+			  onClick={(v) => { toggleHideRead(); v.target.blur(); }}
+			  title="Toggle showing all/unread feeds">
 				{hideRead ? '⚪' : '⚫' }
 			</FloatingButton>
 			{ feeds
 			  .map(item => (
-				<FeedRow
-				  key = { item.fetch_url || item.id }
-				  ref = { item === props.currentFeed ? selectedFeed : null }
-				  isFeed = { item.is_feed }
-				  selected = { item === props.currentFeed }
-				  unread = { item.unreads }
-				  error = { item.parsing_error_count }
-				  title = { item.parsing_error_message }
-				  onClick= { () => props.onFeedChange(item) }>
-					{ item.is_feed && <Favico src={item.icon_data} /> }
-					{ item.title }
-					{ item.unreads > 0 && <UnreadBubble> {item.unreads} </UnreadBubble> }
-				</FeedRow>
+				  <div key = { item.fetch_url || item.id }>
+					{ !item.fetch_url &&
+						(collapsed.includes(item.id) ?
+						<Collapse onClick={() => dispatch({type: 'expand', category: item.id})}>⯈</Collapse> :
+						<Collapse onClick={() => dispatch({type: 'collapse', category: item.id})}>⯆</Collapse>) }
+					<FeedRow
+				  	ref = { item === props.currentFeed ? selectedFeed : null }
+				  	isFeed = { item.is_feed }
+				  	selected = { item === props.currentFeed }
+				  	unread = { item.unreads }
+				  	error = { item.parsing_error_count }
+				  	title = { item.parsing_error_message }
+				  	onClick= { () => props.onFeedChange(item) }>
+						{ item.is_feed && <Favico src={item.icon_data} /> }
+						{ item.title }
+						{ item.unreads > 0 && <UnreadBubble> {item.unreads} </UnreadBubble> }
+					</FeedRow>
+				  </div>
 			))}
 		</FeedList>
 	)

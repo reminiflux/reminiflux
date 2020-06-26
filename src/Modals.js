@@ -10,6 +10,7 @@ const keyMap = [
 	['Up', 'Open previous feed'],
 	['Down', 'Open next feed'],
 	['U', 'Toggle showing unread/all feeds'],
+	['x', 'Collapse/uncollapse current category'],
 	['Left/p/k', 'Open previous item'],
 	['Right/n/j/Space', 'Open next item'],
 	['Home', 'Open first item'],
