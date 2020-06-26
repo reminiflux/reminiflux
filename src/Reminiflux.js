@@ -136,7 +136,7 @@ function Reminiflux() {
 		}
 	}, [feeds, forceUpdate, updateUnreadTrigger]);
 
-	useHotkeys('h', () => { setHelpOpen(true); })
+	useHotkeys('h', () => { settingsOpen || setHelpOpen(true); }, [settingsOpen]);
 
 	return (
 		<ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>

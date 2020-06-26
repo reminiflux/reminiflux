@@ -23,6 +23,7 @@ const keyMap = [
 	['f', 'Star/unstar item'],
 	['v', 'Open original link in new tab'],
 	['c', 'Open comments link in new tab'],
+	['w', 'Send original link to Wallabag (if configured)'],
 	['h', 'Show keyboard shortcuts'],
 	['Escape/Enter', 'Close modal window']
 ]
@@ -100,10 +101,11 @@ export function SettingsModal(props) {
 	const [host, setHost] = useState(localStorage.getItem('miniflux_server'));
 	const [apikey, setApikey] = useState(localStorage.getItem('miniflux_api_key'));
 	const [limit, setLimit] = useState(localStorage.getItem('fetch_limit') || 100);
+	const [wallabag, setWallabag] = useState(localStorage.getItem('wallabag') || "");
 	const [iconCache, resetIconCache] = useState(localStorage.getItem('favicons') || "")
 
 	useHotkeys('esc', () => { props.onClose() }, { filter: () => { return true }})
-	useHotkeys('enter', () => { saveSettings() }, { filter: () => { return true }}, [host, apikey, limit])
+	useHotkeys('enter', () => { saveSettings() }, { filter: () => { return true }}, [host, apikey, limit, wallabag])
 
 	const clearCache = () => {
 		localStorage.removeItem('favicons');
@@ -114,6 +116,7 @@ export function SettingsModal(props) {
 		localStorage.setItem('miniflux_server', host);
 	    localStorage.setItem('miniflux_api_key', apikey);
 		localStorage.setItem('fetch_limit', parseInt(limit) || 100);
+		localStorage.setItem('wallabag', wallabag || '');
 		localStorage.setItem('theme', props.theme);
 		props.onSubmit();
 		props.onClose();
@@ -141,6 +144,11 @@ export function SettingsModal(props) {
 			<b>Maximum number of items to fetch</b>:
 			<br />
 			<ModalInput value={limit} onChange={(e) => setLimit(e.target.value)} />
+		  </p>
+		  <p>
+			<b>Wallabag URL for integration</b> (optional, without /bookmarklet):
+			<br />
+			<ModalInput value={wallabag} onChange={(e) => setWallabag(e.target.value)} />
 		  </p>
 		  <p>
 			  <b>Theme</b>:

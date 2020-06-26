@@ -28,13 +28,33 @@ const StarButton = styled.div`
 	}
 	`;
 
+const WallabagButton = styled.div`
+	display: inline-block;
+	float: right;
+	&:hover {
+		cursor: pointer
+	}
+	img {
+		width: 27px;
+		height: 27px;
+	}
+`;
+
+function wallabag(url) {
+	const w = localStorage.getItem('wallabag');
+	if (!w) return
+	window.open(w.replace(/\/$/, '') + '/bookmarklet?url=' +
+		encodeURIComponent(url), '_blank');
+}
+
 function ItemViewer(props) {
 	const [item, setItem] = useState();
 	const topRef = useRef();
 
 	useHotkeys('f', () => toggleStar(), [item]);
-	useHotkeys('v', () => window.open(item.url, '_blank'), [item]);
-	useHotkeys('c', () => window.open(item.comments_url || item.url, '_blank'), [item]);
+	useHotkeys('v', () => item && window.open(item.url, '_blank'), [item]);
+	useHotkeys('c', () => item && window.open(item.comments_url || item.url, '_blank'), [item]);
+	useHotkeys('w', () => item && wallabag(item.url), [item]);
 	useHotkeys('pagedown', (e) => { 
 		e.preventDefault();
 		const el = document.getElementsByClassName('Pane horizontal Pane2')[1];
@@ -75,6 +95,11 @@ function ItemViewer(props) {
 				<StarButton title="Toggle star" onClick={toggleStar}>
 					{ String.fromCharCode(item.starred ? 9733 : 9734) }
 		  		</StarButton>
+				{ localStorage.getItem('wallabag') &&
+					<WallabagButton onClick={() => wallabag(item.url)}>
+						<img alt='Wallabag' title='Send to Wallabag' src='/wallabag.svg'/>
+					</WallabagButton>
+				}
 			</ItemHeader>
 			<ItemContent dangerouslySetInnerHTML={{__html: item.content}} />
 		</div>
