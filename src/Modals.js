@@ -216,8 +216,8 @@ export function SettingsModal(props) {
 				<br />
 				<select
 					value={props.theme}
-					onChange={(e) => props.themeSetter(e.target.value)}
-				>
+					onChange={(e) => props.themeSetter(e.target.value)}>
+					<option value='auto'>auto</option>
 					<option value='light'>light</option>
 					<option value='dark'>dark</option>
 				</select>

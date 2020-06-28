@@ -63,8 +63,7 @@ const FeedItem = React.forwardRef((props, ref) => (
 	<ItemListRow
 		read={props.item.status !== 'unread'}
 		ref={ref}
-		selected={props.selected}
-	>
+		selected={props.selected}>
 		<ItemListCell width='20px'>
 			<Favico
 				src={props.feed.icon_data}
@@ -85,8 +84,7 @@ const FeedItem = React.forwardRef((props, ref) => (
 			width='40px'
 			align='right'
 			onClick={props.onItemChange}
-			title={props.item.published_at}
-		>
+			title={props.item.published_at}>
 			{relaTimestamp(props.item.published_at)}
 		</ItemListCell>
 	</ItemListRow>
@@ -258,15 +256,13 @@ function FeedItemHeader(props) {
 				</ControlButton>
 				<ControlButton
 					onClick={markReadUntil}
-					title='Mark all until selection as read'
-				>
+					title='Mark all until selection as read'>
 					{' '}
 					&#11123;{' '}
 				</ControlButton>
 				<ControlButton
 					onClick={markReadAfter}
-					title='Mark all after selection as read'
-				>
+					title='Mark all after selection as read'>
 					{' '}
 					&#11121;{' '}
 				</ControlButton>
@@ -275,8 +271,7 @@ function FeedItemHeader(props) {
 					onChange={(v) => {
 						props.setShowRead(v.target.value === 'a')
 						v.target.blur()
-					}}
-				>
+					}}>
 					<option value='u'>Show unread only</option>
 					<option value='a'>Show all</option>
 				</select>
@@ -285,8 +280,7 @@ function FeedItemHeader(props) {
 					onChange={(v) => {
 						props.setSortOldFirst(v.target.value === 'o')
 						v.target.blur()
-					}}
-				>
+					}}>
 					<option value='n'>Newest first</option>
 					<option value='o'>Oldest first</option>
 				</select>
@@ -382,8 +376,7 @@ function ItemBrowser(props) {
 			split='horizontal'
 			minSize='26px'
 			defaultSize='26px'
-			allowResize={false}
-		>
+			allowResize={false}>
 			<FeedItemHeader
 				items={items}
 				currentFeed={props.currentFeed}

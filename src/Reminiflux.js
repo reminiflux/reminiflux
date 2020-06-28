@@ -47,8 +47,14 @@ const sum = (arr) => {
 	}, 0)
 }
 
+const darkModeMediaQuery = window.matchMedia
+	? window.matchMedia('(prefers-color-scheme: dark)').matches
+		? darkTheme
+		: lightTheme
+	: lightTheme
+
 function Reminiflux() {
-	const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
+	const [theme, setTheme] = useState(localStorage.getItem('theme') || 'auto')
 
 	const [error, setError] = useState()
 	const [currentFeed, setCurrentFeed] = useState()
@@ -189,7 +195,14 @@ function Reminiflux() {
 	)
 
 	return (
-		<ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
+		<ThemeProvider
+			theme={
+				theme === 'auto'
+					? darkModeMediaQuery
+					: theme === 'light'
+					? lightTheme
+					: darkTheme
+			}>
 			<GlobalStyles />
 			{helpOpen ? (
 				<KeyHelpModal onClose={() => setHelpOpen(false)} />
@@ -225,13 +238,11 @@ function Reminiflux() {
 						}
 						onChange={(size) =>
 							localStorage.setItem('v_split', size)
-						}
-					>
+						}>
 						<div>
 							<FloatingButton
 								onClick={() => setSettingsOpen(true)}
-								title='Settings'
-							>
+								title='Settings'>
 								&#9881;
 							</FloatingButton>
 							<FloatingButton
@@ -240,8 +251,7 @@ function Reminiflux() {
 									await apiCall('feeds/refresh', setError, {})
 									setUpdateFeedsTrigger(true)
 								}}
-								title='Refresh feeds and counts'
-							>
+								title='Refresh feeds and counts'>
 								&#8635;
 							</FloatingButton>
 
@@ -262,8 +272,7 @@ function Reminiflux() {
 							}
 							onChange={(size) =>
 								localStorage.setItem('h_split', size)
-							}
-						>
+							}>
 							<ItemBrowser
 								currentFeed={currentFeed}
 								currentItem={currentItem}

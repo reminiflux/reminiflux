@@ -166,8 +166,7 @@ function FeedBrowser(props) {
 					toggleHideRead()
 					v.target.blur()
 				}}
-				title='Toggle showing all/unread feeds'
-			>
+				title='Toggle showing all/unread feeds'>
 				{hideRead ? '⚪' : '⚫'}
 			</FloatingButton>
 			{feeds.map((item) => (
@@ -180,8 +179,7 @@ function FeedBrowser(props) {
 										type: 'expand',
 										category: item.id,
 									})
-								}
-							>
+								}>
 								⯈
 							</Collapse>
 						) : (
@@ -191,8 +189,7 @@ function FeedBrowser(props) {
 										type: 'collapse',
 										category: item.id,
 									})
-								}
-							>
+								}>
 								⯆
 							</Collapse>
 						))}
@@ -203,8 +200,7 @@ function FeedBrowser(props) {
 						unread={item.unreads}
 						error={item.parsing_error_count}
 						title={item.parsing_error_message}
-						onClick={() => props.onFeedChange(item)}
-					>
+						onClick={() => props.onFeedChange(item)}>
 						{item.is_feed && <Favico src={item.icon_data} />}
 						{item.title}
 						{item.unreads > 0 && (
