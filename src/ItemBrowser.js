@@ -50,7 +50,7 @@ const ContentPreview = styled.span`
 
 const extractContent = (s) => {
 	var span= document.createElement('span');
-	span.innerHTML= s;
+	span.innerHTML= s.slice(0, 500);
     span.querySelectorAll('*').forEach(c => c.textContent ? c.textContent += ' ' : c.innerText += ' ');
 	return [span.textContent || span.innerText].toString().replace(/ +/g,' ');
 };
@@ -207,12 +207,13 @@ function FeedItemHeader(props) {
 		</Header>
 	)
 }
+
 function ItemBrowser(props) {
 	const [items, setItems] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [sortOldFirst, setSortOldFirst] = useState(localStorage.getItem('sort') === 'o')
 	const [showRead, setShowRead] = useState(localStorage.getItem('filter') === 'a')
-	
+
 	useEffect(() => {
 		const fetchItems = async () => {
 			if (props.currentFeed) {
@@ -235,6 +236,8 @@ function ItemBrowser(props) {
 					a.published_at.localeCompare(b.published_at) :
 					b.published_at.localeCompare(a.published_at)));
 				setIsLoading(false);
+			} else {
+				setItems([]);
 			}
 		};
 		fetchItems();

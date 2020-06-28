@@ -25,6 +25,7 @@ const keyMap = [
 	['v', 'Open original link in new tab'],
 	['c', 'Open comments link in new tab'],
 	['w', 'Send original link to Wallabag (if configured)'],
+	['D', 'Toggle light/dark theme'],
 	['h', 'Show keyboard shortcuts'],
 	['Escape/Enter', 'Close modal window']
 ]
@@ -67,7 +68,7 @@ const ModalTitle = styled.h2`
 	text-align: center;
 	`;
 
-	const KeyTable = styled.table`
+const KeyTable = styled.table`
 	text-align: center;
 	padding: 5px;
 	`;
@@ -114,8 +115,8 @@ export function SettingsModal(props) {
 	}
 
 	const saveSettings = () => {
-		localStorage.setItem('miniflux_server', host);
-	    localStorage.setItem('miniflux_api_key', apikey);
+		localStorage.setItem('miniflux_server', host || '');
+	    localStorage.setItem('miniflux_api_key', apikey || '');
 		localStorage.setItem('fetch_limit', parseInt(limit) || 100);
 		localStorage.setItem('wallabag', wallabag || '');
 		localStorage.setItem('theme', props.theme);

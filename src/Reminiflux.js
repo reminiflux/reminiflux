@@ -15,7 +15,8 @@ import './Reminiflux.css';
 
 const ErrorDiv = styled.div`
 	padding: 10px;
-	background-color: lightcoral;
+	background-color: ${props => props.theme.errorbg};
+	color: ${props => props.theme.errorfg};
 	text-align: center;
 	position: absolute;
 	width: 100%;
@@ -52,7 +53,7 @@ function Reminiflux() {
 	const [feeds, setFeeds] = useState([]);
 
 	const [helpOpen, setHelpOpen] = useState(false);
-	const [settingsOpen, setSettingsOpen] = useState(false);
+	const [settingsOpen, setSettingsOpen] = useState(!localStorage.getItem('miniflux_server'));
 
 	const [updateFeedsTrigger, setUpdateFeedsTrigger] = useState(true);
 	const [updateUnreadTrigger, setUpdateUnreadTrigger] = useState([]);
@@ -137,6 +138,7 @@ function Reminiflux() {
 	}, [feeds, forceUpdate, updateUnreadTrigger]);
 
 	useHotkeys('h', () => { settingsOpen || setHelpOpen(true); }, [settingsOpen]);
+	useHotkeys('shift+d', () => { settingsOpen || setTheme(theme === 'light' ? 'dark' : 'light'); }, [settingsOpen, theme]);
 
 	return (
 		<ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -147,7 +149,10 @@ function Reminiflux() {
 			  <SettingsModal
 				  theme={theme}
 				  themeSetter={setTheme}
-				  onClose={() => setSettingsOpen(false)}
+				  onClose={() => {
+   					  setCurrentFeed(null);
+					  setCurrentItem(null);
+					  setSettingsOpen(false)}}
 				  onSubmit={() => setUpdateFeedsTrigger(true)} /> :
 
 			  <div>

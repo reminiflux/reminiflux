@@ -16,7 +16,9 @@ export const lightTheme = {
 	buttonfg: '#363537',
 	dropdownbg: '#fefefe',
 	dropdownfg: '#363537',
-	modalbg: 'darkgrey'	
+	modalbg: 'darkgrey',
+	errorbg: 'lightcoral',
+	errorfg: 'inherit'
 }
 
 export const darkTheme = {...lightTheme, ...{
@@ -32,5 +34,6 @@ export const darkTheme = {...lightTheme, ...{
 	buttonfg: '#fafafa',
 	dropdownbg: '#565557',
 	dropdownfg: '#fafafa',
-	modalbg: '#565557'
+	modalbg: '#565557',
+	errorbg: 'darkred'
 }}

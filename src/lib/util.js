@@ -5,6 +5,7 @@ export function apiCall(s, errorHandler, body = null) {
 	const server = localStorage.getItem('miniflux_server');
 	const token  = localStorage.getItem('miniflux_api_key')
 	 if (!(server && token)) {
+		errorHandler('Server settings not configured.')
 	 	return new Promise((x,y) => {return null} );
 	}
 	
