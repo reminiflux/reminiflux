@@ -16,13 +16,21 @@ Main features:
 - Light and dark themes
 - Configuration is persisted in the browser's local storage
 
-![Screenshot](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/screenshot.png)
+[**Launch reminiflux now at https://reminiflux.github.io**](https://reminiflux.github.io)
+(see below for details)
+
+## Screenshots
+![Screenshot - Light theme](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/screenshot-light.png)
+![Screenshot - Dark theme](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/screenshot-dark.png)
+![Screen capture](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/capture.gif)
+
+## Usage
 
 Reminiflux is pure web application written in React that uses the API provided by miniflux, it does not need any further backend and can be deployed anywhere as a bunch of HTML, CSS and JS files. It stores its configuration data and cache in the browser's local storage. Therefore it can be used straight away by opening it from Github and configuring it to connect to your already running instance of miniflux.
 
-**Attention! Connecting to miniflux api currently requires some workarounds, please see below for details.**
+**Attention! Connecting to miniflux api requires a miniflux version that supports CORS (implemented in [this PR](https://github.com/miniflux/miniflux/pull/691)). If you are using an older version, read below about possible workarounds.**
 
-[**>>> Launch reminiflux at https://reminiflux.github.io <<<**](https://reminiflux.github.io)
+[**Launch reminiflux now at https://reminiflux.github.io**](https://reminiflux.github.io)
 
 ## Installation
 
@@ -41,9 +49,9 @@ The compiled files will be in the `build` directory, which you can serve with an
 
 Configuration of reminiflux is supposed to be very easy: you only need to supply the URL to your running miniflux instance, an API key that you have generated in miniflux for authenticating against its API and that's it. Reminiflux will connect to this instance from your browser and cache the connection details so that you do not have to enter them again. You will be able to change these parameters in the settings screen.
 
-**There is one caveat however:** Miniflux's API does not support [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) requests yet, which would enable web applications such as reminiflux to call the API services directly from a browser and from a different location (origin). Without this, API calls from the browser would only work if reminiflux and miniflux would share the same origin (i.e. same protocol, host and port), which might be complicated for most to set up.
+**There is one caveat however:** Miniflux's API only recently started to support [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) requests, which enable web applications such as reminiflux to call the API services directly from a browser and from a different location (origin). Without this, API calls from the browser would only work if reminiflux and miniflux would share the same origin (i.e. same protocol, host and port), which might be complicated for most to set up.
 
-This functionality has been requested [here](https://github.com/miniflux/miniflux/issues/675) and hopefully will be implemented soon; in the meantime however, there are multiple options for a workaround.
+CORS support was initiated [here](https://github.com/miniflux/miniflux/issues/675) and implemented [here](https://github.com/miniflux/miniflux/pull/691). It is recommended that you upgrade to a version of miniflux which includes this feature. If you are however using an older version of miniflux, there are multiple options available for a workaround.
 
 ### Option 1: Use a CORS proxy
 
