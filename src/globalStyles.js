@@ -1,4 +1,4 @@
-import { createGlobalStyle} from "styled-components"
+import { createGlobalStyle } from 'styled-components'
 export const GlobalStyles = createGlobalStyle`
 	body {
 		margin: 0px;
@@ -12,20 +12,20 @@ export const GlobalStyles = createGlobalStyle`
 		padding: 0px
 	}
 	a {
-		color: ${({theme}) => theme.link}
+		color: ${({ theme }) => theme.link}
 	}
 	button {
 		border: 1px solid grey;
 		border-radius: 4px;
-		background-color: ${props => props.theme.buttonbg};
-		color: ${props => props.theme.buttonfg};
+		background-color: ${(props) => props.theme.buttonbg};
+		color: ${(props) => props.theme.buttonfg};
 		&: hover {
-			color: ${props => props.theme.buttonbg};
-			background-color: ${props => props.theme.buttonfg};
+			color: ${(props) => props.theme.buttonbg};
+			background-color: ${(props) => props.theme.buttonfg};
 		}
 	}
 	select {
-		background: ${props => props.theme.dropdownbg};
-		color: ${props => props.theme.dropdownfg};
+		background: ${(props) => props.theme.dropdownbg};
+		color: ${(props) => props.theme.dropdownfg};
 	}
-	`;
+	`

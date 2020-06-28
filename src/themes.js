@@ -1,5 +1,5 @@
 export const lightTheme = {
-    body: '#fefefe',
+	body: '#fefefe',
 	text: '#363537',
 	link: 'blue',
 	readentry: '#bbb',
@@ -18,22 +18,25 @@ export const lightTheme = {
 	dropdownfg: '#363537',
 	modalbg: 'darkgrey',
 	errorbg: 'lightcoral',
-	errorfg: 'inherit'
+	errorfg: 'inherit',
 }
 
-export const darkTheme = {...lightTheme, ...{
-    body: '#363537',
-	text: '#fafafa',
-	link: '#2a89bc',
-	readentry: '#999',
-	categorybubble: '#959595',
-	unreaddot: '#bbb',
-	listheaderbg: '#464547',
-	itemheaderbg: '#464547',
-	buttonbg: '#565557',
-	buttonfg: '#fafafa',
-	dropdownbg: '#565557',
-	dropdownfg: '#fafafa',
-	modalbg: '#565557',
-	errorbg: 'darkred'
-}}
+export const darkTheme = {
+	...lightTheme,
+	...{
+		body: '#363537',
+		text: '#fafafa',
+		link: '#2a89bc',
+		readentry: '#999',
+		categorybubble: '#959595',
+		unreaddot: '#bbb',
+		listheaderbg: '#464547',
+		itemheaderbg: '#464547',
+		buttonbg: '#565557',
+		buttonfg: '#fafafa',
+		dropdownbg: '#565557',
+		dropdownfg: '#fafafa',
+		modalbg: '#565557',
+		errorbg: 'darkred',
+	},
+}
