@@ -1,109 +1,130 @@
-import React from 'react';
-import {apiCall, formatDate} from './lib/util';
-import './ItemViewer.css';
-import Hotkeys from 'react-hot-keys';
+import React, { useState, useEffect, useRef } from 'react'
+import { apiCall, formatDate, linkNewTab } from './lib/util'
+import styled from 'styled-components'
+import { useHotkeys } from 'react-hotkeys-hook'
 
-class ItemViewer extends React.Component {
-	constructor(props) {
-	  super(props);
-	  this.state = {
-		item: null
-	  };
-	  this.fetch = this.fetch.bind(this);
-	  this.handleStar = this.handleStar.bind(this);
-	  this.topRef = React.createRef();
+const ItemHeader = styled.div`
+	padding: 2px;
+	background-color: ${(props) => props.theme.itemheaderbg};
+	border-bottom: 1px solid lightgrey;
+	margin-left: 2px;
+	margin-right: 2px;
+`
+
+const ItemHeaderContent = styled.div`
+	display: inline-block;
+`
+
+const ItemContent = styled.div`
+	padding: 5px;
+`
+
+const StarButton = styled.div`
+	display: inline-block;
+	float: right;
+	font-size: 20px;
+	&:hover {
+		cursor: pointer;
 	}
-	onKeyDown(keyName, e, handle) {
-		// Workaround: Pane component cannot be referenced otherwise by refs or ids
-		const div = document.getElementsByClassName('Pane horizontal Pane2')[1];
-		switch(keyName) {
-			case "f":
-				this.handleStar();
-				break;
-			case "v":
-				window.open(this.state.item.url, '_blank');
-				break;
-			case "c":
-				window.open(this.state.item.comments_url || this.state.item.url, '_blank')
-				break;
-			case 'pagedown':
-				div.scrollTop += div.clientHeight;
-				e.preventDefault();
-				break;
-			case 'pageup':
-				div.scrollTop -= div.clientHeight;
-				e.preventDefault();
-				break;
-			default: 
+`
+
+const WallabagButton = styled.div`
+	display: inline-block;
+	float: right;
+	&:hover {
+		cursor: pointer;
+	}
+	img {
+		width: 27px;
+		height: 27px;
+	}
+`
+
+function wallabag(url) {
+	const w = localStorage.getItem('wallabag')
+	if (!w) return
+	window.open(
+		w.replace(/\/$/, '') + '/bookmarklet?url=' + encodeURIComponent(url),
+		'_blank'
+	)
+}
+
+function ItemViewer(props) {
+	const [item, setItem] = useState()
+	const topRef = useRef()
+
+	useHotkeys('f', () => toggleStar(), [item])
+	useHotkeys('v', () => item && window.open(item.url, '_blank'), [item])
+	useHotkeys(
+		'c',
+		() => item && window.open(item.comments_url || item.url, '_blank'),
+		[item]
+	)
+	useHotkeys('w', () => item && wallabag(item.url), [item])
+	useHotkeys('pagedown', (e) => {
+		e.preventDefault()
+		const el = document.getElementsByClassName('Pane horizontal Pane2')[1]
+		el.scrollTop += el.clientHeight
+	})
+	useHotkeys('pageup', (e) => {
+		e.preventDefault()
+		const el = document.getElementsByClassName('Pane horizontal Pane2')[1]
+		el.scrollTop -= el.clientHeight
+	})
+
+	useEffect(() => {
+		setItem(props.currentItem)
+		if (topRef.current) topRef.current.scrollIntoView()
+	}, [props.currentItem])
+
+	const toggleStar = async () => {
+		if (item) {
+			await apiCall(
+				'entries/' + item.id + '/bookmark',
+				props.errorHandler,
+				{}
+			)
+			// update in item, which is a reference to an element in props.items, so that the change
+			// persists in the overall item list as long as it is not refetched
+			item.starred = !item.starred
+			// update also item to trigger rerender
+			setItem({ ...item, starred: item.starred })
 		}
 	}
-	componentDidMount() {
-	  this.fetch();
-	}
-	componentDidUpdate(prevProps) {
-	  if (prevProps.currentItem !== this.props.currentItem) {
-		this.fetch();
-	  }
-	  if (this.topRef.current) { 
-		this.topRef.current.scrollIntoView();
-	  }
-	}
-	fetch() {
-	  if (!this.props.currentItem) {
-		this.setState({item: null})
-		return;
-	  }
-	  apiCall('entries/' + this.props.currentItem, this.props.errorHandler)
-	  .then(i => this.setState({item: i},
-		e => {}));
-	}
-	handleStar() {
-		apiCall('entries/' + this.state.item.id + '/bookmark', this.props.errorHandler, {})
-		.then(() => setTimeout(function() { this.fetch(); }.bind(this), 100),
-		e => {});
-	}
-	render() {
-	  const item = this.state.item;
-	  if (!item) {
-		return <div />;
-	  }
-	  const content = {__html: item.content };
-	  return (
-		<Hotkeys 
-		 keyName="f,v,c,pagedown,pageup"
-		 allowRepeat="true" 
-		 onKeyDown={this.onKeyDown.bind(this)}>
-		  <div ref={this.topRef}>
-		    <div className="itemheader">
-			  <table className="itemheader">
-				<tbody>
-					<tr>
-						<td className="title">
-							<a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}</a>
-							&nbsp;
-							<a href={item.comments_url || item.url} title="Comments" style={{'textDecoration': 'none'}} target="_blank"  rel="noopener noreferrer">
-								<span role="img" aria-label="comments">&#128172;</span>
-							</a>
-						</td>
-						<td rowSpan="2" className="star">
-							<div className="star" onClick={this.handleStar} title="Toggle star">
-					    	{item.starred ? String.fromCharCode(9733) : String.fromCharCode(9734) }
-		  					</div>
-						</td>
-					</tr>
-					<tr>
-						<td className="controls">
-							{ item.author ? item.author : item.feed.title }, { formatDate(item.published_at) }
-						</td>
-					</tr>
-				</tbody>
-			  </table>
-		    </div>
-		    <div className="itemcontent" dangerouslySetInnerHTML={content} />
-		  </div>
-		</Hotkeys>
-		);
-	}
-  }
 
-  export default ItemViewer;
+	return !item ? null : (
+		<div ref={topRef}>
+			<ItemHeader>
+				<ItemHeaderContent>
+					{linkNewTab(item.title, item.url)}
+					&nbsp;
+					{linkNewTab(
+						<span role='img' aria-label='comments'>
+							&#128172;
+						</span>,
+						item.comments_url || item.url,
+						true
+					)}
+					<br />
+					{item.author || item.feed.title},{' '}
+					{formatDate(item.published_at)}
+				</ItemHeaderContent>
+				<StarButton title='Toggle star' onClick={toggleStar}>
+					{String.fromCharCode(item.starred ? 9733 : 9734)}
+				</StarButton>
+				{localStorage.getItem('wallabag') && (
+					<WallabagButton onClick={() => wallabag(item.url)}>
+						<img
+							alt='Wallabag'
+							title='Send to Wallabag'
+							src='/wallabag.svg'
+						/>
+					</WallabagButton>
+				)}
+			</ItemHeader>
+			<ItemContent dangerouslySetInnerHTML={{ __html: item.content }} />
+		</div>
+	)
+}
+
+export default ItemViewer

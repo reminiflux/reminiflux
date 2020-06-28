@@ -2,7 +2,19 @@
 
 ## Overview
 
-Reminiflux is an alternative web frontend for [miniflux](https://github.com/miniflux/miniflux), the minimalist and opinionated feed reader. Reminiflux offers a look and feel which is more similar to Google Reader and TT-RSS with a 3-paned display showing the list of feeds, items and an article. Reminiflux also supports keyboard shortcuts, press `h` for details.
+Reminiflux is an alternative web frontend for [miniflux](https://github.com/miniflux/miniflux), the minimalist and opinionated feed reader. Reminiflux offers a look and feel which is more similar to Google Reader and TT-RSS with a 3-paned display showing the list of feeds, items and an article.
+
+Main features:
+- List of all/unread feeds grouped by category, with number of unread items displayed
+- List of all/unread items per feed or per category, sorted by date ascending/descending
+- List of all/unread starred items
+- Collapse/expand categories
+- Display of feed favicons (cached locally)
+- One-button actions to mark all items as read or mark items before/after selection as read
+- Keyboard navigation and actions (press `h`)
+- Send to Wallabag (if configured)
+- Light and dark themes
+- Configuration is persisted in the browser's local storage
 
 ![Screenshot](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/screenshot.png)
 
