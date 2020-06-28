@@ -215,7 +215,10 @@ function Reminiflux() {
 						setCurrentItem(null)
 						setSettingsOpen(false)
 					}}
-					onSubmit={() => setUpdateFeedsTrigger(true)}
+					onSubmit={() => {
+						setError(null)
+						setUpdateFeedsTrigger(true)
+					}}
 				/>
 			) : (
 				<div>

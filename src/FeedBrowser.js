@@ -59,7 +59,7 @@ const FloatingButton = styled.button`
 const Collapse = styled.div`
 	display: inline-block;
 	float: left;
-	margin-right: 2px;
+	margin-right: 3px;
 	&:hover {
 		cursor: pointer;
 	}
@@ -180,7 +180,7 @@ function FeedBrowser(props) {
 										category: item.id,
 									})
 								}>
-								⯈
+								▶
 							</Collapse>
 						) : (
 							<Collapse
@@ -190,7 +190,7 @@ function FeedBrowser(props) {
 										category: item.id,
 									})
 								}>
-								⯆
+								▼
 							</Collapse>
 						))}
 					<FeedRow
