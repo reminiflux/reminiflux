@@ -109,9 +109,11 @@ export function KeyHelpModal(props) {
 }
 
 export function SettingsModal(props) {
-	const [host, setHost] = useState(localStorage.getItem('miniflux_server'))
+	const [host, setHost] = useState(
+		localStorage.getItem('miniflux_server') || ''
+	)
 	const [apikey, setApikey] = useState(
-		localStorage.getItem('miniflux_api_key')
+		localStorage.getItem('miniflux_api_key') || ''
 	)
 	const [limit, setLimit] = useState(
 		localStorage.getItem('fetch_limit') || 100
@@ -152,6 +154,11 @@ export function SettingsModal(props) {
 		resetIconCache('')
 	}
 
+	const configDemo = () => {
+		setHost('https://minifluxdemo.duckdns.org')
+		setApikey('demo')
+	}
+
 	const saveSettings = () => {
 		localStorage.setItem('miniflux_server', host || '')
 		localStorage.setItem('miniflux_api_key', apikey || '')
@@ -175,6 +182,8 @@ export function SettingsModal(props) {
 				{dayjs(preval`module.exports = new Date()`).format(
 					'YYYY-MM-DD HH:mm:ss (Z)'
 				)}
+				<br />
+				<button onClick={configDemo}>Configure demo access</button>
 			</p>
 			<h3>Settings</h3>
 			<p>
