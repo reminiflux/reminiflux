@@ -172,7 +172,7 @@ function Reminiflux() {
 		}
 
 		if (updateUnreadTrigger.length > 0) {
-			updateUnreadTrigger.forEach((u) =>
+			;[-2, -1, ...updateUnreadTrigger].forEach((u) =>
 				updateUnread(u, updateUnreadTrigger)
 			)
 			setUpdateUnreadTrigger([])
