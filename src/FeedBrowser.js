@@ -18,6 +18,18 @@ const UnreadBubble = styled.div`
 	padding: 1px;
 `
 
+const MarkReadButton = styled.div`
+	float: right;
+	margin-right: 10px;
+	font-weight: bold;
+	color: ${(props) => props.theme.text};
+	display: none;
+	&:hover {
+		color: red;
+		cursor: pointer;
+	}
+`
+
 const FeedRow = styled.div`
 	margin-left: ${(props) => (props.isFeed ? '20px' : '0px')};
 	font-weight: ${(props) => (props.isFeed ? 'inherit' : 'bold')};
@@ -33,6 +45,9 @@ const FeedRow = styled.div`
 	&:hover {
 		background-color: ${(props) => props.theme.hoverbg};
 		cursor: pointer;
+	}
+	&:hover ${MarkReadButton} {
+		display: inline-block;
 	}
 	${UnreadBubble} {
 		background-color: ${(props) =>
@@ -206,6 +221,15 @@ function FeedBrowser(props) {
 						{item.unreads > 0 && (
 							<UnreadBubble> {item.unreads} </UnreadBubble>
 						)}
+						<MarkReadButton
+							title='Double click to mark all items read'
+							onClick={(e) => e.stopPropagation()}
+							onDoubleClick={(e) => {
+								e.stopPropagation()
+								props.markAllRead(item)
+							}}>
+							✓
+						</MarkReadButton>
 					</FeedRow>
 				</div>
 			))}

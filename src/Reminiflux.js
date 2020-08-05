@@ -176,6 +176,41 @@ function Reminiflux() {
 		}
 	}, [feeds, forceUpdate, updateUnreadTrigger])
 
+	const markAllRead = async (f) => {
+		const urls = f.fetch_url
+			? [f.fetch_url]
+			: feeds
+					.filter((x) => x.category)
+					.filter((x) => x.category.id === f.id)
+					.map((x) => x.fetch_url)
+
+		const result = await Promise.all(
+			urls.map(
+				(u) =>
+					apiCall(
+						u + (u.includes('?') ? '&' : '?') + '&status=unread'
+					),
+				setError
+			)
+		)
+
+		const items = []
+		result.forEach((i) => items.push(...i.entries))
+
+		if (!items.length) return
+
+		await apiCall('entries', setError, {
+			entry_ids: items.map((x) => x.id),
+			status: 'read',
+		})
+
+		setUpdateUnreadTrigger(
+			items
+				.map((x) => x.feed.id)
+				.filter((f, index, self) => self.indexOf(f) === index)
+		)
+	}
+
 	useHotkeys(
 		'h',
 		() => {
@@ -259,6 +294,7 @@ function Reminiflux() {
 								currentFeed={currentFeed}
 								feeds={feeds}
 								onFeedChange={setCurrentFeed}
+								markAllRead={markAllRead}
 								errorHandler={setError}
 							/>
 						</div>

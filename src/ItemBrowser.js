@@ -251,20 +251,17 @@ function FeedItemHeader(props) {
 
 			<HeaderControls>
 				<ControlButton onClick={markAllRead} title='Mark all as read'>
-					{' '}
-					&#10003;{' '}
+					✓
 				</ControlButton>
 				<ControlButton
 					onClick={markReadUntil}
 					title='Mark all until selection as read'>
-					{' '}
-					⤓{' '}
+					⤓
 				</ControlButton>
 				<ControlButton
 					onClick={markReadAfter}
 					title='Mark all after selection as read'>
-					{' '}
-					⤒{' '}
+					⤒
 				</ControlButton>
 				<select
 					value={props.showRead ? 'a' : 'u'}
