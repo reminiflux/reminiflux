@@ -77,3 +77,33 @@ export function linkNewTab(title, link, stripStyle) {
 		</a>
 	)
 }
+
+function hashCode(s) {
+	var hash = 0
+	for (var i = 0; i < s.length; i++) {
+		hash = s.charCodeAt(i) + ((hash << 5) - hash)
+	}
+	return hash
+}
+
+export function createFeedIcon(feedName) {
+	var canvas = document.createElement('canvas')
+	canvas.width = 16
+	canvas.height = 16
+	var context = canvas.getContext('2d')
+
+	const color = hashCode(feedName) % 360
+
+	context.beginPath()
+	context.rect(0, 0, 16, 16)
+	context.fillStyle = 'hsl(' + color + ', 50%, 25%)'
+	context.fill()
+
+	context.fillStyle = 'hsl(' + (360 - color) + ', 100%, 75%)'
+	context.font = 'bold 14px sans-serif'
+	context.textBaseline = 'middle'
+	context.textAlign = 'center'
+	context.fillText(feedName[0], canvas.width / 2, canvas.height / 2 + 1)
+
+	return canvas.toDataURL()
+}
