@@ -161,18 +161,17 @@ function FeedBrowser(props) {
 		[props.currentFeed, collapsed]
 	)
 
-	useEffect(
-		() =>
-			setFeeds(
-				props.feeds.filter(
-					(f) =>
-						(!hideRead || f.unreads > 0) &&
-						(!f.is_feed ||
-							(f.is_feed && !collapsed.includes(f.category.id)))
-				)
-			),
-		[props.feeds, hideRead, collapsed]
-	)
+	useEffect(() => {
+		setFeeds(
+			props.feeds.filter(
+				(f) =>
+					(!hideRead || f.unreads > 0) &&
+					(!f.is_feed ||
+						(f.is_feed && !collapsed.includes(f.category.id)))
+			)
+		)
+		props.clearTrigger(false)
+	}, [props, hideRead, collapsed])
 
 	return (
 		<FeedList>

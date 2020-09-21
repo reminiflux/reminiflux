@@ -64,6 +64,7 @@ function Reminiflux() {
 	)
 
 	const [updateFeedsTrigger, setUpdateFeedsTrigger] = useState(true)
+	const [renderFeedsTrigger, setRenderFeedsTrigger] = useState(true)
 	const [updateUnreadTrigger, setUpdateUnreadTrigger] = useState([])
 
 	const [, updateState] = React.useState()
@@ -150,6 +151,7 @@ function Reminiflux() {
 				setError
 			)
 			f['unreads'] = unread.total
+			setRenderFeedsTrigger(true)
 
 			document.title =
 				sum(state.filter((f) => f.id > 0 && f.is_feed)) +
@@ -296,6 +298,8 @@ function Reminiflux() {
 								onFeedChange={setCurrentFeed}
 								markAllRead={markAllRead}
 								errorHandler={setError}
+								updateTrigger={renderFeedsTrigger}
+								clearTrigger={setRenderFeedsTrigger}
 							/>
 						</div>
 
