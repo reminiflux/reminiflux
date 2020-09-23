@@ -28,4 +28,7 @@ export const GlobalStyles = createGlobalStyle`
 		background: ${(props) => props.theme.dropdownbg};
 		color: ${(props) => props.theme.dropdownfg};
 	}
+	#itemcontent >* img {
+		max-width: 100%;
+	}
 	`

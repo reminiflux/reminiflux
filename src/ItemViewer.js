@@ -122,7 +122,10 @@ function ItemViewer(props) {
 					</WallabagButton>
 				)}
 			</ItemHeader>
-			<ItemContent dangerouslySetInnerHTML={{ __html: item.content }} />
+			<ItemContent
+				id='itemcontent'
+				dangerouslySetInnerHTML={{ __html: item.content }}
+			/>
 		</div>
 	)
 }
