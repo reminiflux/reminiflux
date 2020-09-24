@@ -214,6 +214,14 @@ function Reminiflux() {
 		)
 	}
 
+	const refreshFeedCounts = () => {
+		setUpdateUnreadTrigger(feeds.map((x) => x.id))
+	}
+	const refreshFeeds = async () => {
+		await apiCall('feeds/refresh', setError, {})
+		setUpdateFeedsTrigger(true)
+	}
+
 	useHotkeys(
 		'h',
 		() => {
@@ -228,6 +236,9 @@ function Reminiflux() {
 		},
 		[settingsOpen, theme]
 	)
+
+	useHotkeys('r', refreshFeedCounts, [feeds])
+	useHotkeys('shift+r', refreshFeeds, [feeds])
 
 	return (
 		<ThemeProvider
@@ -285,16 +296,9 @@ function Reminiflux() {
 							</FloatingButton>
 							<ClickNHold
 								time={2}
-								onClickNHold={async (e) => {
-									await apiCall('feeds/refresh', setError, {})
-									setUpdateFeedsTrigger(true)
-								}}
+								onClickNHold={refreshFeeds}
 								onEnd={(e, enough) => {
-									if (!enough) {
-										setUpdateUnreadTrigger(
-											feeds.map((x) => x.id)
-										)
-									}
+									if (!enough) refreshFeedCounts()
 									e.target.blur()
 								}}>
 								<FloatingButton

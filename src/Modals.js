@@ -26,6 +26,8 @@ const keyMap = [
 	['c', 'Open comments link in new tab'],
 	['w', 'Send original link to Wallabag (if configured)'],
 	['D', 'Toggle light/dark theme'],
+	['r', 'Refresh unread count for all feeds'],
+	['R', 'Trigger refetch of all feeds and full refresh of feed list'],
 	['h', 'Show keyboard shortcuts'],
 	['Escape/Enter', 'Close modal window'],
 ]
