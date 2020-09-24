@@ -44,19 +44,28 @@ export const GlobalStyles = createGlobalStyle`
 		background-size: 100% 100%;
 		-webkit-animation: fill 2s forwards infinite;
 		animation: fill 2s forwards infinite;
-		border: 1px solid red;
 		color: ${(props) => props.theme.buttonbg};
 	}
-
 	@-webkit-keyframes fill {
-		to {
-			background-size:100% 0;
-		}
+		to { background-size: 100% 0}
 	}
-
 	@keyframes fill {
-		to {
-			background-size:100% 0;
-			}
-		}
+		to { background-size: 100% 0}
+	}
+	.cnh_holding div {
+		background: -webkit-linear-gradient(to left, darkred, darkred) darkred no-repeat 0 0;
+		background: linear-gradient(to left, darkred, darkred) darkred no-repeat 0 0;
+		mix-blend-mode: normal;
+		background-size: 220% 100%;
+		-webkit-animation: bar 2s forwards infinite;
+		animation: bar 2s forwards infinite;
+	}
+	@-webkit-keyframes bar {
+		from { background-position: -120% 0}
+		to { background-position: 0 0}
+	}
+	@keyframes bar {
+		from { background-position: -120% 0}
+		to { background-position: 0 0}
+	}
 	`

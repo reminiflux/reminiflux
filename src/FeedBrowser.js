@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useRef, useReducer } from 'react'
 import styled from 'styled-components'
 import { useHotkeys } from 'react-hotkeys-hook'
+import ClickNHold from 'react-click-n-hold'
+import { relaTimestamp } from './lib/util'
 
 const FeedList = styled.div`
 	padding: 5px;
 `
 
-const UnreadBubble = styled.div`
+const UnreadBubble = styled.span`
 	margin-left: 10px;
 	border-radius: 4px;
 	font-weight: bold;
@@ -18,7 +20,7 @@ const UnreadBubble = styled.div`
 	padding: 1px;
 `
 
-const MarkReadButton = styled.div`
+const MarkReadButton = styled.span`
 	float: right;
 	margin-right: 10px;
 	font-weight: bold;
@@ -207,29 +209,42 @@ function FeedBrowser(props) {
 								▼
 							</Collapse>
 						))}
-					<FeedRow
-						ref={item === props.currentFeed ? selectedFeed : null}
-						isFeed={item.is_feed}
-						selected={item === props.currentFeed}
-						unread={item.unreads}
-						error={item.parsing_error_count}
-						title={item.parsing_error_message}
-						onClick={() => props.onFeedChange(item)}>
-						{item.is_feed && <Favico src={item.icon_data} />}
-						{item.title}
-						{item.unreads > 0 && (
-							<UnreadBubble> {item.unreads} </UnreadBubble>
-						)}
-						<MarkReadButton
-							title='Double click to mark all items read'
-							onClick={(e) => e.stopPropagation()}
-							onDoubleClick={(e) => {
-								e.stopPropagation()
-								props.markAllRead(item)
-							}}>
-							✓
-						</MarkReadButton>
-					</FeedRow>
+					<ClickNHold
+						time={2}
+						onClickNHold={(e) => props.markAllRead(item)}
+						onEnd={(e, enough) => {
+							if (!enough) props.onFeedChange(item)
+						}}>
+						<FeedRow
+							ref={
+								item === props.currentFeed ? selectedFeed : null
+							}
+							isFeed={item.is_feed}
+							selected={item === props.currentFeed}
+							unread={item.unreads}
+							error={item.parsing_error_count}
+							title={
+								item.parsing_error_message ||
+								'Updated ' +
+									relaTimestamp(item.checked_at) +
+									' ago'
+							}>
+							{item.is_feed && <Favico src={item.icon_data} />}
+							{item.title}
+							{item.unreads > 0 && (
+								<UnreadBubble> {item.unreads} </UnreadBubble>
+							)}
+							<MarkReadButton
+								title='Double click to mark all items read'
+								onClick={(e) => e.stopPropagation()}
+								onDoubleClick={(e) => {
+									e.stopPropagation()
+									props.markAllRead(item)
+								}}>
+								✓
+							</MarkReadButton>
+						</FeedRow>
+					</ClickNHold>
 				</div>
 			))}
 		</FeedList>
