@@ -31,4 +31,32 @@ export const GlobalStyles = createGlobalStyle`
 	#itemcontent >* img {
 		max-width: 100%;
 	}
+	.cnh_holding button {
+		background: -webkit-linear-gradient(
+			${(props) => props.theme.buttonbg},
+			${(props) => props.theme.buttonbg})
+			${(props) => props.theme.buttonfg} no-repeat 0 0;
+		background: linear-gradient(
+			${(props) => props.theme.buttonfg},
+			${(props) => props.theme.buttonfg})
+			${(props) => props.theme.buttonbg} no-repeat 0 0;
+		mix-blend-mode: multiply;
+		background-size: 100% 100%;
+		-webkit-animation: fill 2s forwards infinite;
+		animation: fill 2s forwards infinite;
+		border: 1px solid red;
+		color: ${(props) => props.theme.buttonbg};
+	}
+
+	@-webkit-keyframes fill {
+		to {
+			background-size:100% 0;
+		}
+	}
+
+	@keyframes fill {
+		to {
+			background-size:100% 0;
+			}
+		}
 	`

@@ -10,6 +10,7 @@ import { apiCall, createFeedIcon } from './lib/util'
 import { GlobalStyles } from './globalStyles'
 import { ThemeProvider } from 'styled-components'
 import { lightTheme, darkTheme } from './themes'
+import ClickNHold from 'react-click-n-hold'
 
 import './Reminiflux.css'
 
@@ -282,16 +283,26 @@ function Reminiflux() {
 								title='Settings'>
 								&#9881;
 							</FloatingButton>
-							<FloatingButton
-								onClick={async (v) => {
-									v.target.blur()
+							<ClickNHold
+								time={2}
+								onClickNHold={async (e) => {
 									await apiCall('feeds/refresh', setError, {})
 									setUpdateFeedsTrigger(true)
 								}}
-								title='Refresh feeds and counts'>
-								&#8635;
-							</FloatingButton>
-
+								onEnd={(e, enough) => {
+									if (!enough) {
+										setUpdateUnreadTrigger(
+											feeds.map((x) => x.id)
+										)
+									}
+									e.target.blur()
+								}}>
+								<FloatingButton
+									title='Short press to refresh unread count, 
+								long press to trigger fetch and full refresh'>
+									&#8635;
+								</FloatingButton>
+							</ClickNHold>
 							<FeedBrowser
 								currentFeed={currentFeed}
 								feeds={feeds}
