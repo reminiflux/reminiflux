@@ -237,8 +237,20 @@ function Reminiflux() {
 		[settingsOpen, theme]
 	)
 
-	useHotkeys('r', refreshFeedCounts, [feeds])
-	useHotkeys('shift+r', refreshFeeds, [feeds])
+	useHotkeys(
+		'r',
+		() => {
+			settingsOpen || refreshFeedCounts()
+		},
+		[feeds, settingsOpen]
+	)
+	useHotkeys(
+		'shift+r',
+		() => {
+			settingsOpen || refreshFeeds()
+		},
+		[feeds, settingsOpen]
+	)
 
 	return (
 		<ThemeProvider
