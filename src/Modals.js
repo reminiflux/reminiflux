@@ -157,7 +157,7 @@ export function SettingsModal(props) {
 	}
 
 	const configDemo = () => {
-		setHost('https://minifluxdemo.duckdns.org')
+		setHost('https://minifluxdemo.duckdns.org:9999')
 		setApikey('demo')
 	}
 
