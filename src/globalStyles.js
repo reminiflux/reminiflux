@@ -28,7 +28,7 @@ export const GlobalStyles = createGlobalStyle`
 		background: ${(props) => props.theme.dropdownbg};
 		color: ${(props) => props.theme.dropdownfg};
 	}
-	#itemcontent >* img {
+	#itemcontent img {
 		max-width: 100%;
 	}
 	.cnh_holding button {
