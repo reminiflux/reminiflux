@@ -91,7 +91,6 @@ function ItemViewer(props) {
 			setItem({ ...item, starred: item.starred })
 		}
 	}
-
 	return !item ? null : (
 		<div ref={topRef}>
 			<ItemHeader>
@@ -106,7 +105,7 @@ function ItemViewer(props) {
 						true
 					)}
 					<br />
-					{item.author || item.feed.title},{' '}
+					{item.feed.title}, {item.author || '-'},{' '}
 					{formatDate(item.published_at)}
 				</ItemHeaderContent>
 				<StarButton title='Toggle star' onClick={toggleStar}>
