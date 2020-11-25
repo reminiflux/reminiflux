@@ -351,6 +351,11 @@ function Reminiflux() {
 
 							<ItemViewer
 								currentItem={currentItem}
+								onFeedChange={(f) =>
+									setCurrentFeed(
+										feeds.find((i) => i.id === f.id)
+									)
+								}
 								errorHandler={setError}
 							/>
 						</SplitPane>

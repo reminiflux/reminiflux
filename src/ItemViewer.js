@@ -105,8 +105,11 @@ function ItemViewer(props) {
 						true
 					)}
 					<br />
-					{item.feed.title}, {item.author || '-'},{' '}
-					{formatDate(item.published_at)}
+					{/* eslint-disable-next-line */}
+					<a href='#' onClick={() => props.onFeedChange(item.feed)}>
+						{item.feed.title}
+					</a>
+					, {item.author || '-'}, {formatDate(item.published_at)}
 				</ItemHeaderContent>
 				<StarButton title='Toggle star' onClick={toggleStar}>
 					{String.fromCharCode(item.starred ? 9733 : 9734)}
