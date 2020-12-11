@@ -77,7 +77,7 @@ const KeyTable = styled.table`
 `
 
 const ModalInput = styled.input`
-	width: 350px;
+	width: 400px;
 `
 
 export function KeyHelpModal(props) {
@@ -117,6 +117,7 @@ export function SettingsModal(props) {
 	const [apikey, setApikey] = useState(
 		localStorage.getItem('miniflux_api_key') || ''
 	)
+	const [refresh, setRefresh] = useState(localStorage.getItem('refresh') || 0)
 	const [limit, setLimit] = useState(
 		localStorage.getItem('fetch_limit') || 100
 	)
@@ -148,7 +149,7 @@ export function SettingsModal(props) {
 				return true
 			},
 		},
-		[host, apikey, limit, wallabag]
+		[host, apikey, limit, refresh, wallabag]
 	)
 
 	const clearCache = () => {
@@ -165,6 +166,7 @@ export function SettingsModal(props) {
 		localStorage.setItem('miniflux_server', host || '')
 		localStorage.setItem('miniflux_api_key', apikey || '')
 		localStorage.setItem('fetch_limit', parseInt(limit) || 100)
+		localStorage.setItem('refresh', parseInt(refresh) || 0)
 		localStorage.setItem('wallabag', wallabag || '')
 		localStorage.setItem('theme', props.theme)
 		props.onSubmit()
@@ -213,6 +215,16 @@ export function SettingsModal(props) {
 					onChange={(e) => setLimit(e.target.value)}
 				/>
 			</p>
+			<p>
+				<b>Refresh interval for unread counts</b> (in seconds, disabled
+				if 0):
+				<br />
+				<ModalInput
+					value={refresh}
+					onChange={(e) => setRefresh(e.target.value)}
+				/>
+			</p>
+
 			<p>
 				<b>Wallabag URL for integration</b> (optional, without
 				/bookmarklet):

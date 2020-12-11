@@ -138,6 +138,17 @@ function Reminiflux() {
 	}, [updateFeedsTrigger, cache, forceUpdate])
 
 	useEffect(() => {
+		if (localStorage.getItem('refresh') > 0) {
+			let timer = setInterval(
+				() => setUpdateFeedsTrigger(true),
+				1000 * localStorage.getItem('refresh')
+			)
+			return () => clearInterval(timer)
+		}
+		// eslint-disable-next-line
+	}, [localStorage.getItem('refresh')])
+
+	useEffect(() => {
 		const updateUnread = async (f, state) => {
 			if (parseInt(f)) {
 				state = feeds
