@@ -115,11 +115,14 @@ function Reminiflux() {
 				if (f.icon && f.id in cache) {
 					f.icon_data = cache[f.id]
 				} else if (f.icon) {
-					const icon = await apiCall(
-						'feeds/' + f.id + '/icon',
-						setError
-					)
-					f.icon_data = 'data:' + icon.data
+					try {
+						const icon = await apiCall(
+							'feeds/' + f.id + '/icon',
+							(e) => {}
+						)
+						f.icon_data = 'data:' + icon.data
+					} catch {}
+
 					localStorage.setItem(
 						'favicons',
 						JSON.stringify({
