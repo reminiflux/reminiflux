@@ -105,7 +105,7 @@ export function KeyHelpModal(props) {
 					))}
 				</tbody>
 			</KeyTable>
-			<button onClick={props.onClose}>OK</button>
+			<button type="button" onClick={props.onClose}>OK</button>
 		</StyledModal>
 	)
 }
@@ -187,9 +187,10 @@ export function SettingsModal(props) {
 					'YYYY-MM-DD HH:mm:ss (Z)'
 				)}
 				<br />
-				<button onClick={configDemo}>Configure demo access</button>
+				<button type="button" onClick={configDemo}>Configure demo access</button>
 			</p>
 			<h3>Settings</h3>
+			<form onSubmit={saveSettings}>
 			<p>
 				<b>Host</b> (without /v1, e.g.{' '}
 				<i>https://miniflux.mydomain.tld</i>):
@@ -197,6 +198,9 @@ export function SettingsModal(props) {
 				<ModalInput
 					value={host}
 					onChange={(e) => setHost(e.target.value)}
+					type="text"
+					name="username"
+					autoComplete="username"
 				/>
 			</p>
 			<p>
@@ -205,6 +209,9 @@ export function SettingsModal(props) {
 				<ModalInput
 					value={apikey}
 					onChange={(e) => setApikey(e.target.value)}
+					type="password"
+					name="password"
+					autoComplete="current-password"
 				/>
 			</p>
 			<p>
@@ -248,10 +255,11 @@ export function SettingsModal(props) {
 			<p>
 				<b>Icon cache size</b>:{Math.round(iconCache.length / 1024)}k
 				<br />
-				<button onClick={clearCache}>Clear cache</button>
+				<button type="button" onClick={clearCache}>Clear cache</button>
 			</p>
-			<button onClick={saveSettings}>OK</button>
-			<button onClick={props.onClose}>Cancel</button>
+			<button type="submit">OK</button>
+			<button type="button" onClick={props.onClose}>Cancel</button>
+		  </form>
 		</StyledModal>
 	)
 }
