@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import SplitPane from 'react-split-pane'
 import FeedBrowser from './FeedBrowser'
 import ItemBrowser from './ItemBrowser'
@@ -66,7 +66,6 @@ function Reminiflux() {
 
 	const [updateFeedsTrigger, setUpdateFeedsTrigger] = useState(true)
 	const [renderFeedsTrigger, setRenderFeedsTrigger] = useState(true)
-	const [updateUnreadTrigger, setUpdateUnreadTrigger] = useState([])
 
 	const [, updateState] = React.useState()
 	const forceUpdate = React.useCallback(() => updateState({}), [])
@@ -134,7 +133,6 @@ function Reminiflux() {
 				}
 			})
 			setFeeds(feedTree)
-			setUpdateUnreadTrigger(feedTree)
 		}
 		if (updateFeedsTrigger) fetchFeeds()
 		setUpdateFeedsTrigger(false)
@@ -151,47 +149,76 @@ function Reminiflux() {
 		// eslint-disable-next-line
 	}, [localStorage.getItem('refresh')])
 
-	useEffect(() => {
-		const updateUnread = async (f, state) => {
-			if (parseInt(f)) {
-				state = feeds
-				f = feeds.find((x) => x.id === f && x.fetch_url)
+	const refreshFeedCounts = () => {
+		document.title =
+			sum(feeds.filter((f) => f.id > 0 && f.is_feed)) + ' | reminiflux'
+
+		feeds
+			.filter((f) => !f.fetch_url)
+			.forEach((c) => {
+				c['unreads'] = sum(
+					feeds.filter((x) => x.category && x.category.id === c.id)
+				)
+			})
+
+		forceUpdate()
+	}
+
+	useMemo(async () => {
+		if (feeds.length > 0) {
+			const fetchUnreadForFeed = async (f) => {
+				if (parseInt(f)) {
+					f = feeds.find((x) => x.id === f && x.fetch_url)
+				}
+				if (!f.fetch_url) {
+					return 0
+				}
+				const unread = await apiCall(
+					f.fetch_url +
+						(f.fetch_url.includes('?') ? '&' : '?') +
+						'status=unread&limit=1',
+					setError
+				)
+				f['unreads'] = unread.total
+				return unread.total
 			}
-			if (!f.fetch_url) return
-
-			const unread = await apiCall(
-				f.fetch_url +
-					(f.fetch_url.includes('?') ? '&' : '?') +
-					'status=unread&limit=1',
-				setError
-			)
-			f['unreads'] = unread.total
-			setRenderFeedsTrigger(true)
-
-			document.title =
-				sum(state.filter((f) => f.id > 0 && f.is_feed)) +
-				' | reminiflux'
-
-			state
-				.filter((f) => !f.fetch_url)
-				.forEach((c) => {
-					c['unreads'] = sum(
-						state.filter(
-							(x) => x.category && x.category.id === c.id
+			const { unreads } = await apiCall('feeds/counters', () => {}).catch(
+				async () => {
+					// catch for version of miniflux older than PR https://github.com/miniflux/miniflux/pull/1431
+					const tasks = feeds.slice()
+					while (tasks.length) {
+						await Promise.all(
+							tasks.splice(-10).map(fetchUnreadForFeed)
 						)
-					)
-				})
-
-			forceUpdate()
-		}
-
-		if (updateUnreadTrigger.length > 0) {
-			;[-2, -1, ...updateUnreadTrigger].forEach((u) =>
-				updateUnread(u, updateUnreadTrigger)
+						refreshFeedCounts()
+					}
+					return {
+						unreads: feeds.reduce((result, f) => {
+							result[f.id] = f.unreads
+							return result
+						}, {}),
+					}
+				}
 			)
-			setUpdateUnreadTrigger([])
+
+			unreads[-1] =
+				unreads[-1] ??
+				Object.values(unreads).reduce((total, i) => total + i, 0)
+			unreads[-2] = unreads[-2] ?? (await fetchUnreadForFeed(-2))
+
+			feeds
+				.map((f) => {
+					if (parseInt(f)) {
+						f = feeds.find((x) => x.id === f && x.fetch_url)
+					}
+					return f
+				})
+				.filter((f) => f.fetch_url)
+				.map((f) => (f['unreads'] = unreads[f.id] || 0))
+			refreshFeedCounts()
 		}
-	}, [feeds, forceUpdate, updateUnreadTrigger])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [feeds])
 
 	const markAllRead = async (f) => {
 		const urls = f.fetch_url
@@ -221,16 +248,9 @@ function Reminiflux() {
 			status: 'read',
 		})
 
-		setUpdateUnreadTrigger(
-			items
-				.map((x) => x.feed.id)
-				.filter((f, index, self) => self.indexOf(f) === index)
-		)
+		refreshFeedCounts()
 	}
 
-	const refreshFeedCounts = () => {
-		setUpdateUnreadTrigger(feeds.map((x) => x.id))
-	}
 	const refreshFeeds = async () => {
 		await apiCall('feeds/refresh', setError, {})
 		setUpdateFeedsTrigger(true)
@@ -359,7 +379,7 @@ function Reminiflux() {
 								currentItem={currentItem}
 								feeds={feeds}
 								onItemChange={setCurrentItem}
-								updateUnread={setUpdateUnreadTrigger}
+								refreshFeedCounts={refreshFeedCounts}
 								errorHandler={setError}
 							/>
 

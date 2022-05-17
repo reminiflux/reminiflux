@@ -353,11 +353,11 @@ function ItemBrowser(props) {
 				entry_ids: i.map((x) => x.id),
 				status: read || read === undefined ? 'read' : 'unread',
 			})
-			props.updateUnread(
-				i
-					.map((x) => x.feed.id)
-					.filter((f, index, self) => self.indexOf(f) === index)
-			)
+			props.feeds
+				.filter((f) => i.map((x) => x.feed_id).indexOf(f.id) !== -1)
+				.map(
+					(f) => (f['unreads'] += read || read === undefined ? -1 : 1)
+				)
 
 			const currItems = items
 			i.forEach(
@@ -366,6 +366,8 @@ function ItemBrowser(props) {
 						read || read === undefined ? 'read' : 'unread')
 			)
 			setItems(currItems)
+
+			props.refreshFeedCounts()
 		}
 	}
 	return (
