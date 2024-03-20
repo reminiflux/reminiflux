@@ -24,12 +24,6 @@ Main features:
 ![Screenshot - Dark theme](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/screenshot-dark.png)
 ![Screen capture](https://raw.githubusercontent.com/reminiflux/reminiflux/source/docs/capture.gif)
 
-## Demo
-
-If you do not have miniflux deployed or readily available or just want to try the UI as quick as possible, a public miniflux instance has been made available for demo purposes with some preselected feeds and no write operations (read/unread status and stars are not persisted).
-
-Use the `Configure demo access` button in the Settings dialog to access this instance.
-
 ## Usage
 
 Reminiflux is pure web application written in React that uses the API provided by miniflux, it does not need any further backend and can be deployed anywhere as a bunch of HTML, CSS and JS files. It stores its configuration data and cache in the browser's local storage. Therefore it can be used straight away by opening it from Github and configuring it to connect to your already running instance of miniflux.
@@ -49,6 +43,7 @@ As reminiflux is just a bunch of web page files, you can use the version hosted 
 
 The compiled files will be in the `build` directory, which you can serve with any kind of static web hosting, or alternatively, directly from the directory with the following command:
 
+    $ npm install -g serve
     $ serve -s build
 
 ## Configuration

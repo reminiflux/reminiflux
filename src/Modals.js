@@ -105,7 +105,9 @@ export function KeyHelpModal(props) {
 					))}
 				</tbody>
 			</KeyTable>
-			<button type="button" onClick={props.onClose}>OK</button>
+			<button type='button' onClick={props.onClose}>
+				OK
+			</button>
 		</StyledModal>
 	)
 }
@@ -157,11 +159,6 @@ export function SettingsModal(props) {
 		resetIconCache('')
 	}
 
-	const configDemo = () => {
-		setHost('https://minifluxdemo.duckdns.org:9999')
-		setApikey('demo')
-	}
-
 	const saveSettings = () => {
 		localStorage.setItem('miniflux_server', host || '')
 		localStorage.setItem('miniflux_api_key', apikey || '')
@@ -186,80 +183,84 @@ export function SettingsModal(props) {
 				{dayjs(preval`module.exports = new Date()`).format(
 					'YYYY-MM-DD HH:mm:ss (Z)'
 				)}
-				<br />
-				<button type="button" onClick={configDemo}>Configure demo access</button>
 			</p>
 			<h3>Settings</h3>
 			<form onSubmit={saveSettings}>
-			<p>
-				<b>Host</b> (without /v1, e.g.{' '}
-				<i>https://miniflux.mydomain.tld</i>):
-				<br />
-				<ModalInput
-					value={host}
-					onChange={(e) => setHost(e.target.value)}
-					type="text"
-					name="username"
-					autoComplete="username"
-				/>
-			</p>
-			<p>
-				<b>API key</b> (generated in Miniflux):
-				<br />
-				<ModalInput
-					value={apikey}
-					onChange={(e) => setApikey(e.target.value)}
-					type="password"
-					name="password"
-					autoComplete="current-password"
-				/>
-			</p>
-			<p>
-				<b>Maximum number of items to fetch</b>:
-				<br />
-				<ModalInput
-					value={limit}
-					onChange={(e) => setLimit(e.target.value)}
-				/>
-			</p>
-			<p>
-				<b>Refresh interval for unread counts</b> (in seconds, disabled
-				if 0):
-				<br />
-				<ModalInput
-					value={refresh}
-					onChange={(e) => setRefresh(e.target.value)}
-				/>
-			</p>
+				<p>
+					<b>Host</b> (without /v1, e.g.{' '}
+					<i>https://miniflux.mydomain.tld</i>):
+					<br />
+					<ModalInput
+						value={host}
+						onChange={(e) => setHost(e.target.value)}
+						type='text'
+						name='username'
+						autoComplete='username'
+					/>
+				</p>
+				<p>
+					<b>API key</b> (generated in Miniflux):
+					<br />
+					<ModalInput
+						value={apikey}
+						onChange={(e) => setApikey(e.target.value)}
+						type='password'
+						name='password'
+						autoComplete='current-password'
+					/>
+				</p>
+				<p>
+					<b>Maximum number of items to fetch</b>:
+					<br />
+					<ModalInput
+						value={limit}
+						onChange={(e) => setLimit(e.target.value)}
+					/>
+				</p>
+				<p>
+					<b>Refresh interval for unread counts</b> (in seconds,
+					disabled if 0):
+					<br />
+					<ModalInput
+						value={refresh}
+						onChange={(e) => setRefresh(e.target.value)}
+					/>
+				</p>
 
-			<p>
-				<b>Wallabag URL for integration</b> (optional, without
-				/bookmarklet):
-				<br />
-				<ModalInput
-					value={wallabag}
-					onChange={(e) => setWallabag(e.target.value)}
-				/>
-			</p>
-			<p>
-				<b>Theme</b>:
-				<br />
-				<select
-					value={props.theme}
-					onChange={(e) => props.themeSetter(e.target.value)}>
-					<option value='auto'>auto</option>
-					<option value='light'>light</option>
-					<option value='dark'>dark</option>
-				</select>
-			</p>
-			<p>
-				<b>Icon cache size</b>:{Math.round(iconCache.length / 1024)}k
-				<br />
-				<button type="button" onClick={clearCache}>Clear cache</button>
-			</p>
-			<button type="submit">OK</button>
-			<button type="button" onClick={props.onClose}>Cancel</button>
-		  </form>
+				<p>
+					<b>Wallabag URL for integration</b> (optional, without
+					/bookmarklet):
+					<br />
+					<ModalInput
+						value={wallabag}
+						onChange={(e) => setWallabag(e.target.value)}
+					/>
+				</p>
+				<p>
+					<b>Theme</b>:
+					<br />
+					<select
+						value={props.theme}
+						onChange={(e) => props.themeSetter(e.target.value)}
+					>
+						<option value='auto'>auto</option>
+						<option value='light'>light</option>
+						<option value='dark'>dark</option>
+					</select>
+				</p>
+				<p>
+					<b>Icon cache size</b>:{Math.round(iconCache.length / 1024)}
+					k
+					<br />
+					<button type='button' onClick={clearCache}>
+						Clear cache
+					</button>
+				</p>
+				<button type='submit'>OK</button>
+				<button type='button' onClick={props.onClose}>
+					Cancel
+				</button>
+			</form>
 		</StyledModal>
 	)
 }
