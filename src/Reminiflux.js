@@ -71,6 +71,7 @@ function Reminiflux() {
 	const [, updateState] = React.useState()
 	const forceUpdate = React.useCallback(() => updateState({}), [])
 
+	// eslint-disable-next-line
 	const cache = JSON.parse(localStorage.getItem('favicons')) || {}
 
 	useEffect(() => {
@@ -274,7 +275,8 @@ function Reminiflux() {
 					: theme === 'light'
 					? lightTheme
 					: darkTheme
-			}>
+			}
+		>
 			<GlobalStyles />
 			{helpOpen ? (
 				<KeyHelpModal onClose={() => setHelpOpen(false)} />
@@ -313,11 +315,13 @@ function Reminiflux() {
 						}
 						onChange={(size) =>
 							localStorage.setItem('v_split', size)
-						}>
+						}
+					>
 						<div>
 							<FloatingButton
 								onClick={() => setSettingsOpen(true)}
-								title='Settings'>
+								title='Settings'
+							>
 								&#9881;
 							</FloatingButton>
 							<ClickNHold
@@ -326,10 +330,12 @@ function Reminiflux() {
 								onEnd={(e, enough) => {
 									if (!enough) refreshFeedCounts()
 									e.target.blur()
-								}}>
+								}}
+							>
 								<FloatingButton
 									title='Short press to refresh unread count, 
-								long press to trigger fetch and full refresh'>
+								long press to trigger fetch and full refresh'
+								>
 									&#8635;
 								</FloatingButton>
 							</ClickNHold>
@@ -353,7 +359,8 @@ function Reminiflux() {
 							}
 							onChange={(size) =>
 								localStorage.setItem('h_split', size)
-							}>
+							}
+						>
 							<ItemBrowser
 								currentFeed={currentFeed}
 								currentItem={currentItem}

@@ -99,12 +99,19 @@ const collapseReducer = (state, action) => {
 }
 
 function FeedBrowser(props) {
-	const [hideRead, setHideRead] = useState(false)
+	const [hideRead, setHideRead] = useState(
+		localStorage.getItem('feedfilter') === 'a'
+	)
+
 	const [collapsed, dispatch] = useReducer(
 		collapseReducer,
 		JSON.parse(localStorage.getItem('collapsed')) || []
 	)
-	const toggleHideRead = () => setHideRead(!hideRead)
+	const toggleHideRead = () => {
+		setHideRead(!hideRead)
+		localStorage.setItem('feedfilter', hideRead ? 'u' : 'a')
+	}
+
 	const [feeds, setFeeds] = useState([])
 	const selectedFeed = useRef()
 
@@ -182,7 +189,8 @@ function FeedBrowser(props) {
 					toggleHideRead()
 					v.target.blur()
 				}}
-				title='Toggle showing all/unread feeds'>
+				title='Toggle showing all/unread feeds'
+			>
 				{hideRead ? '⚪' : '⚫'}
 			</FloatingButton>
 			{feeds.map((item) => (
@@ -195,7 +203,8 @@ function FeedBrowser(props) {
 										type: 'expand',
 										category: item.id,
 									})
-								}>
+								}
+							>
 								▶
 							</Collapse>
 						) : (
@@ -205,7 +214,8 @@ function FeedBrowser(props) {
 										type: 'collapse',
 										category: item.id,
 									})
-								}>
+								}
+							>
 								▼
 							</Collapse>
 						))}
@@ -214,7 +224,8 @@ function FeedBrowser(props) {
 						onClickNHold={(e) => props.markAllRead(item)}
 						onEnd={(e, enough) => {
 							if (!enough) props.onFeedChange(item)
-						}}>
+						}}
+					>
 						<FeedRow
 							ref={
 								item === props.currentFeed ? selectedFeed : null
@@ -228,7 +239,8 @@ function FeedBrowser(props) {
 								'Updated ' +
 									relaTimestamp(item.checked_at) +
 									' ago'
-							}>
+							}
+						>
 							{item.is_feed && <Favico src={item.icon_data} />}
 							{item.title}
 							{item.unreads > 0 && (
@@ -240,7 +252,8 @@ function FeedBrowser(props) {
 								onDoubleClick={(e) => {
 									e.stopPropagation()
 									props.markAllRead(item)
-								}}>
+								}}
+							>
 								✓
 							</MarkReadButton>
 						</FeedRow>
